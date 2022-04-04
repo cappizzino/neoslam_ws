@@ -49,3 +49,14 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+.catkin_workspace
+
+# jpg files
+image/*.jpg
+*.ini
+
+# VSCode
+.vscode
+
+# BAG
+*.bag
