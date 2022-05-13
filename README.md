@@ -1,24 +1,19 @@
 # NeoSLAM
 NeoSLAM is an algorithm based on neocortex models.
 
-## Installation. ## 
+## Docker
 
-We assume that you are working on Ubuntu 18.04 and already have installed ROS Melodic.
-
-Prepare the repository:
+To build the Docker container:
 
 ```
-cd ~
-mkdir -p ~/ros_workspace/src
-cd ~/ros_workspace/src
-catkin_init_workspace
-cd ~/ros_workspace
-catkin_make
+cd docker
+
+bash build-docker.sh
 ```
 
-Clone this repository to your workspace:
+To run the Docker container:
+
 
 ```
-cd ~/ros_workspace/src
-git clone https://github.com/cappizzino/neoslam_ws.git
+bash run-docker.sh
 ```
