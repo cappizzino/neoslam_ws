@@ -20,6 +20,12 @@ RUN pip install -r /tmp/requirements.txt
 
 RUN apt-get install -y \
     ros-$(rosversion -d)-cv-bridge
+    
+WORKDIR /home/neoslam_ws/src
 
-RUN mkdir -p /workspace
-WORKDIR /workspace
+RUN git clone https://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@github.com/cappizzino/ROS_programs.git
+
+WORKDIR /home/neoslam_ws
+RUN source /opt/ros/melodic/setup.bash
+RUN catkin_make
+RUN source devel/setup.bash
