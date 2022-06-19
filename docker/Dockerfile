@@ -4,6 +4,7 @@ RUN apt-get -y update && apt-get install -y \
     make \
     gcc \
     git \
+    tmux \
     vim
 
 RUN apt-get update && apt-get install -y \
@@ -26,6 +27,9 @@ WORKDIR /home/neoslam_ws/src
 RUN git clone https://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@github.com/cappizzino/ROS_programs.git
 
 WORKDIR /home/neoslam_ws
-RUN source /opt/ros/melodic/setup.bash
-RUN catkin_make
-RUN source devel/setup.bash
+
+RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; cd /home/neoslam_ws; catkin_make'
+RUN echo "source /home/neoslam_ws/devel/setup.bash" >> ~/.bashrc
+
+
+
