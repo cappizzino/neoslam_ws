@@ -1,0 +1,23 @@
+<launch>
+
+  <arg name="record_bag" default="n"/>
+ 
+  <!--- Neocortex -->
+  <node pkg="neocortex" name="neocortex" type="neocortex_gc.py" output="screen">
+    <!-- Bag file -->
+    <param name="bag_file" value="1" />
+    <param name="bagfile_folder_path" value="/media/cappizzino/HD PIZZINO/dataset/"/>
+    <param name="bag_filename_morning" value="_2022-03-24-09-36-07.bag"/>
+    <param name="bag_filename_afternoon" value="_2022-03-24-16-17-34_outdoor_afternoon.bag"/>
+    <!-- Tempory Memory - value="apical / distal" -->
+    <param name="tempory_memory" value="distal" />
+  </node>
+
+    <!--- Record Rosbag -->
+  <arg name="path" default="/media/cappizzino/HD PIZZINO/dataset/HWU/"/>
+  <node pkg="rosbag" type="record" name="record" args=  "/feats_htm /feats_lsbh /husky_hwu/odom /husky_hwu/processed_image /husky_hwu/LocalView/Template /husky_hwu/ExperienceMap/MapMarker /husky_hwu/gps  -O $(arg path)husky_out.bag" if="$(eval arg('record_bag') == 'y')" />
+  
+  <!--- rqt view -->
+  <node pkg="rqt_image_view" type="rqt_image_view" name="image_view_debug" args="/husky_hwu/processed_image"/>
+
+</launch>

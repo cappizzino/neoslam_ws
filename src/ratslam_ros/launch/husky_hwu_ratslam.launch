@@ -1,0 +1,32 @@
+<launch>
+  
+	<!--<machine name="local_alt" address="localhost" default="true" />-->
+	
+  <!--<remap from="/stereo_camera/left/image_raw" to="/husky_hwu/camera/image"/>-->
+  <!--<remap from="/husky_velocity_controller/odom" to="/husky_hwu/odom"/>-->
+
+  <remap from="/husky_hwu/image" to="/husky_hwu/camera/image"/>
+  
+	<node name="RatSLAMLocalViewCells" pkg="ratslam_ros" type="ratslam_lv" args="$(find ratslam_ros)/config/config_husky_hwu.txt.in _image_transport:=raw" cwd="node" required="true" />
+	<node name="RatSLAMPoseCells" pkg="ratslam_ros" type="ratslam_pc" args="$(find ratslam_ros)/config/config_husky_hwu.txt.in _image_transport:=raw" cwd="node" required="true" />
+	<node name="RatSLAMExperienceMap" pkg="ratslam_ros" type="ratslam_em" args="$(find ratslam_ros)/config/config_husky_hwu.txt.in _image_transport:=raw" cwd="node" required="true" />
+
+	<!--<node pkg="rqt_plot" type="rqt_plot" name="plot_vt_em" args="/irat_red/LocalView/Template/current_id,/irat_red/PoseCell/TopologicalAction/dest_id" />-->
+	
+  <!--<node pkg="rosbag" type="record" name="record" args="/irat_red/ExperienceMap/Map /irat_red/ExperienceMap/RobotPose /irat_red/LocalView/Template /irat_red/PoseCell/TopologicalAction /overhead/pose -O ratslam_out.bag" />-->
+
+  <!--Viewer -->
+  <!--<node pkg="image_view" type="image_view" name="camera_left" args="image:=/stereo_camera/left/image_raw" />-->
+
+  <!--Plot -->
+  <!--<node pkg="rqt_plot" type="rqt_plot" name="plot_odom" args="/husky_velocity_controller/odom/pose/pose/position/" />-->
+
+  <!--Run rosbag created -->
+  <arg name="path_1" default="/media/cappizzino/Game\ Drive\ for\ PS4/Carlos_Pizzino/"/>
+  <arg name="path_2" default="/home/cappizzino/Documentos/doutorado/rosbag_folder/"/>
+  <arg name="file_husky_01" default="_2022-02-16-14-29-31_fixed"/>
+  <arg name="file_husky_02" default="subset__2022-02-23-18-37-17"/>
+  <arg name="file_irat_01" default="irat_aus_28112011"/>
+  <node pkg="rosbag" type="play" name="rosbag_play" output="screen" required="true" args="$(arg path_1)$(arg file_husky_02).bag -s 50 -u 350"/>
+
+</launch>

@@ -1,0 +1,11 @@
+<launch>
+
+  <!--- Gridcell network -->
+  <node pkg="gridcell" name="gridcell" type="gridcells_vt.py" output="screen">
+  </node>
+
+  <!-- Rosbag -->
+  <arg name="path" default="/media/cappizzino/Game\ Drive\ for\ PS4/Carlos_Pizzino/"/>
+  <node pkg="rosbag" type="record" name="record" args="/husky_hwu/odom_gc -O $(arg path)husky_grid_cell.bag" />-->
+
+</launch>

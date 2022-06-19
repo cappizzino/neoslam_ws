@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="laser_enabled" default="true"/>
+  <arg name="realsense_enabled" default="false"/>
+
+  <!--Simulation -->
+  <arg name="record_position" default="false" />
+  <arg name="bags_directory" value="/home/cappizzino/ros_workspace_dsc/neocortex_bags"/>
+
+  <!--- Neocortex -->
+  <node pkg="neocortex" name="neocortex" type="neocortex_pil.py" output="screen">
+  </node>
+
+  <!--- Gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find husky_gazebo)/worlds/clearpath_playpen.world"/>
+    <arg name="paused" value="true"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="false"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!--- Husky -->
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="realsense_enabled" value="$(arg realsense_enabled)"/>
+  </include>
+
+  <!-- Run Rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find husky_viz)/rviz/robot_capp.rviz" output="screen"/>
+
+  <!-- Run the map server -->
+  <arg name="map_file" default="$(find husky_navigation)/maps/playpen_map.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+  <arg name="scan_topic" default="$(eval optenv('HUSKY_LASER_TOPIC', 'scan'))" />
+
+  <!--- Run AMCL -->
+  <include file="$(find husky_navigation)/launch/amcl.launch">
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+  </include>
+
+  <!--- Run Move Base -->
+  <include file="$(find husky_navigation)/launch/move_base.launch" />
+
+  <!--- Run Camera tasks -->
+  <!--include file="$(find task_camera)/launch/task_camera_node.launch" /-->
+
+  <node pkg="image_view" type="image_saver" name="image_saver">
+    <param name="save_all_image" value="false" />
+    <param name="filename_format" value="$(env HOME)/ros_workspace_dsc/image/image%04d.%s"/>
+    <remap from="/image" to="/realsense/color/image_raw"/>
+  </node>
+
+  <!--- Run Nav tasks -->
+  <include file="$(find task_nav)/launch/movebase_seq.launch" />
+
+  <!--- Image -->
+  <!--node pkg="cnn_alexnet" name="cnn_alexnet" type="cnn_alexnet_image.py" output="screen">
+    <param name="/realsense/color/image_raw/compressed/format" type="string" value="png" />
+  </node-->
+
+  <!-- Record bag -->
+  <node pkg="rosbag" type="record" name="rosbag_record_position"
+       args="record -o $(arg bags_directory)/neocortex_bags /rosout /amcl_pose /feats_cnn"
+       if="$(eval record_position)"/>
+
+  <!--- Run Trajectory -->
+  <!--node pkg="tasks" name="path_nav" type="path_nav.py" output="screen">
+  </node-->
+  
+</launch>

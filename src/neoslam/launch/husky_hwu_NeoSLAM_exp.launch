@@ -1,0 +1,34 @@
+<launch>
+
+  <arg name="record_bag" default="n"/>
+
+  <!--- Neocortex -->
+  <node pkg="neocortex" name="neocortex" type="neocortex_gc.py" output="screen">
+    <!-- Bag file -->
+    <param name="bag_file" value="0" />
+    <param name="bagfile_folder_path" value="/media/cappizzino/HD PIZZINO/dataset/HWU"/>
+    <param name="bag_filename_morning" value="_2022-03-24-09-36-07.bag"/>
+    <param name="bag_filename_afternoon" value="_2022-03-24-16-17-34.bag"/>
+    <!-- Tempory Memory - value="apical / distal" -->
+    <param name="tempory_memory" value="distal" />
+  </node>
+
+  <!--- RatSLAM -->
+  <node name="RatSLAMPoseCells" pkg="ratslam_ros" type="ratslam_pc" args="$(find ratslam_ros)/config/config_husky_hwu.txt.in _image_transport:=raw" cwd="node" required="true" />
+	<node name="RatSLAMExperienceMap" pkg="ratslam_ros" type="ratslam_em" args="$(find ratslam_ros)/config/config_husky_hwu.txt.in _image_transport:=raw" cwd="node" required="true" />
+
+  <!--- Record Rosbag -->
+  <arg name="path" default="/media/cappizzino/HD PIZZINO/dataset/HWU/"/>
+  <node pkg="rosbag" type="record" name="record" args=  "/feats_htm /feats_lsbh /husky_hwu/odom /husky_hwu/processed_image /husky_hwu/LocalView/Template /husky_hwu/ExperienceMap/MapMarker /husky_hwu/gps  -O $(arg path)husky_out.bag" if="$(eval arg('record_bag') == 'y')" /> 
+
+  <!--- Record Rosbag Real Husky
+  <node pkg="rosbag" type="record" name="neoslam_recorder" output="screen"
+       args="record -o /media/cappizzino/Game\ Drive\ for\ PS4/Carlos_Pizzino/ -a -x /astra(.*)|(.*)velodyne(.*)|/stereo_camera/left/image_raw/(.*)|/stereo_camera/left/image_mono(.*)|/stereo_camera/left/image_color(.*)|/stereo_camera/left/image_rect(.*)|/stereo_camera/left/image_rect_color(.*)|/stereo_camera/right/image_raw/(.*)|/stereo_camera/right/image_mono(.*)|/stereo_camera/right/image_color(.*)|/stereo_camera/right/image_rect(.*)|/stereo_camera/right/image_rect_color(.*)|/stereo_camera/disparity|/stereo_camera/points2|/stereo_camera/stereo_image_proc_node(.*)|/stereo_camera/right/(.*)"/>-->
+
+  <!--- rqt view -->
+  <node pkg="rqt_image_view" type="rqt_image_view" name="image_view_debug" args="/stereo_camera/left/image_raw"/>
+
+  <!--- NeoSLAM plots 
+  <include file="$(find neoslam_plots)/launch/husky_hwu_neoslam_plot.launch" /> -->
+
+</launch>

@@ -1,0 +1,32 @@
+<launch>
+
+  <remap from="/stereo_camera/left/image_raw" to="/husky_hwu/camera/image"/>
+  <remap from="/odometry/filtered" to="/husky_hwu/odometry/filtered"/>
+  <remap from="/odom" to="/husky_hwu/odom"/>
+
+  <!--- Neocortex -->
+  <node pkg="neocortex" name="neocortex" type="neocortex_gc.py" output="screen">
+    <!-- Bag file -->
+    <param name="bag_file" value="0" />
+    <param name="bagfile_folder_path" value="/media/cappizzino/Game Drive for PS4/Carlos_Pizzino"/>
+    <param name="bag_filename_morning" value="_2022-03-24-09-36-07.bag"/>
+    <param name="bag_filename_afternoon" value="_2022-03-24-16-17-34.bag"/>
+    <!-- Tempory Memory - value="apical / distal" -->
+    <param name="tempory_memory" value="distal" />
+  </node>
+
+  <remap from="/stereo_camera/left/image_raw" to="/husky_hwu/camera/image"/>
+  <remap from="/odometry/filtered" to="/husky_hwu/odometry/filtered"/>
+  <remap from="/odom" to="/husky_hwu/odom"/>
+
+  <!--- rqt view -->
+  <node pkg="rqt_image_view" type="rqt_image_view" name="image_view_debug" args="/husky_hwu/camera/image"/>
+
+  <!--- NeoSLAM plots -->
+  <include file="$(find neoslam_plots)/launch/husky_hwu_neoslam_plot.launch" />
+
+  <!-- Rosbag Record
+  <arg name="path" default="/media/cappizzino/Game\ Drive\ for\ PS4/Carlos_Pizzino/"/>
+  <node pkg="rosbag" type="record" name="record" args="/feats_cnn /feats_htm /feats_lsbh /husky_hwu/odometry/filtered -O $(arg path)husky_out_02.bag" />-->
+
+</launch>
