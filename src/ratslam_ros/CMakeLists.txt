@@ -67,7 +67,7 @@ add_library(ratslam src/ratslam/experience_map.cpp src/ratslam/posecell_network.
 
 
 # uncomment is you don't have irrlicht installed
-add_definitions("-DHAVE_IRRLICHT")
+# add_definitions("-DHAVE_IRRLICHT")
 
 add_executable(ratslam_lv src/main_lv.cpp)
 target_link_libraries(ratslam_lv 

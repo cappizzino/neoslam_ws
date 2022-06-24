@@ -110,7 +110,6 @@ catkin_package(
    #INCLUDE_DIRS include
    LIBRARIES neocortex
    CATKIN_DEPENDS actionlib_msgs roscpp rospy std_msgs message_runtime
-   DEPENDS system_lib
    DEPENDS message_runtime
 )
 

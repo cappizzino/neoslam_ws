@@ -21,8 +21,22 @@ RUN pip install -r /tmp/requirements.txt
 
 RUN apt-get install -y \
     ros-$(rosversion -d)-cv-bridge
-    
+
+RUN apt-get install -y python-rosdep \
+    ros-$(rosversion -d)-tf \
+    ros-$(rosversion -d)-compressed-image-transport \
+    libirrlicht-dev \
+    libopencv-dev \
+    libegl1-mesa-dev \
+    ros-$(rosversion -d)-image-view \
+    python-sklearn  \
+    ros-$(rosversion -d)-rqt ros-$(rosversion -d)-rqt-common-plugins
+
 WORKDIR /home/neoslam_ws/src
+
+RUN rosdep install --from-paths /home/neoslam_ws/src --ignore-src -r -y
+    
+COPY /src /home/neoslam_ws/src 
 
 RUN git clone https://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@github.com/cappizzino/ROS_programs.git
 

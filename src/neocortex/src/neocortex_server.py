@@ -121,7 +121,7 @@ class ActionServer():
         # Load Matrix - Dimension Reduction and binarizarion
         # ****************************************
         rospy.loginfo("Dimension Reduction")
-        createMatrix = 0
+        createMatrix = 1
         out_dir = os.path.dirname(__file__)
         out_dir = os.path.join(out_dir, 'data')
         if createMatrix == 1:
