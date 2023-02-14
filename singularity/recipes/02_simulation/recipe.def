@@ -1,0 +1,86 @@
+Bootstrap: docker
+From: osrf/ros:melodic-desktop-full-bionic
+
+# Container RUNTIME setup of environment.
+# NOTE: These variables are not made available during BUILD
+# time, for define them as well in the '%post' section.
+%environment
+    export LC_ALL=C
+
+# Tool downloading and installations, write configurations, create directories, etc.
+# NOTE: Should be used to setup BUILD time environment variables.
+%post
+    apt-get update
+    
+    apt-get install -y \
+        ros-$ROS_DISTRO-gazebo-ros-pkgs \
+        ros-$ROS_DISTRO-gazebo-ros-control \
+        ros-$ROS_DISTRO-husky-desktop \
+        ros-$ROS_DISTRO-husky-simulator \
+        ros-$ROS_DISTRO-teleop-twist-keyboard \
+        dbus
+
+    # other useful tools
+    apt-get install -y \
+        python-pip \
+        make \
+        gcc \
+        python-catkin-tools \
+        vim \
+        nano \
+        zsh \
+        ranger \
+        tmux \
+        git \
+        lsb-release
+    
+    pip install setuptools==25.2.0
+    pip install setuptools-scm==1.15.0rc1
+    pip install nupic
+    pip install torchvision==0.5.0 --no-cache-dir
+    pip install scipy==1.2.2
+    pip install opencv-python==3.4.2.17
+    pip install future
+
+    apt-get install -y \
+        ros-$(rosversion -d)-cv-bridge \
+        python-rosdep \
+        ros-$(rosversion -d)-tf \
+        ros-$(rosversion -d)-compressed-image-transport \
+        libirrlicht-dev \
+        libopencv-dev \
+        libegl1-mesa-dev \
+        ros-$(rosversion -d)-image-view \
+        python-sklearn  \
+        ros-$(rosversion -d)-rqt ros-$(rosversion -d)-rqt-common-plugins
+
+    SIM_LOCATION=/opt/neoslam
+
+    # link configuration file for the MRS env
+    ln -s $SIM_LOCATION/host/99-sim_env.sh /.singularity.d/env/99-sim_env.sh
+
+# Called upon container 'singularity run' command.
+# NOTE: The content of this section is written in a file inside the container, so
+# that it can be run once the aforementioned command is issued.
+%runscript
+    CMD="${@}"
+    
+    if [ -z "${CMD}" ]; then
+        /bin/bash --login
+    else
+        /bin/bash --login -c "${CMD}"
+    fi
+
+    exit 0
+
+# Adds metadata to the container inside '/.singularity.d/labels.json'.
+%labels
+    Author cappizzino@gmail.com
+    Version v0.0.1
+
+# Adds metadata into the container that can be accessed through 
+# 'singularity run-help' command.
+%help
+    Singularity image built from ROS Melodic with Gazebo, Husky packages and gazebo_ros_pkgs.
+
+
