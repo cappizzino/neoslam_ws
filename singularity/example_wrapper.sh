@@ -26,8 +26,8 @@ MOUNT_PATH="$SINGULARITY_PATH/mount"
 
 # use <file>.sif for normal container
 # use <folder>/ for sandbox container
-CONTAINER_NAME="barnbot.sif"
-OVERLAY_NAME="barnbot.img"
+CONTAINER_NAME="neoslam.sif"
+OVERLAY_NAME="neoslam.img"
 
 CONTAINED=true  # true: will isolate from the HOST's home
 CLEAN_ENV=true # true: will clean the shell environment before runnning container
@@ -43,10 +43,10 @@ WRITABLE=false # true: will run it as --writable (works with --sandbox container
 MOUNTS=(
   # mount the custom user workspace into the container
   #                  HOST PATH                                    CONTAINER PATH
-  "type=bind" "$WORKSPACE_PATH" "/home/$USER/barnbot_ws"
+  "type=bind" "$WORKSPACE_PATH" "/home/$USER/neoslam_ws"
 
   # mount the MRS shell additions into the container, DO NOT MODIFY
-  "type=bind" "$MOUNT_PATH" "/opt/barnbot/host"
+  "type=bind" "$MOUNT_PATH" "/opt/neoslam/host"
 )
 
 ## | ------------------ advanced user config ------------------ |
