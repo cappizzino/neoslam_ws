@@ -40,6 +40,7 @@ From: osrf/ros:melodic-desktop-full-bionic
     pip install torchvision==0.5.0 --no-cache-dir
     pip install scipy==1.2.2
     pip install opencv-python==3.4.2.17
+    pip install numpy==1.14.5
     pip install future
 
     apt-get install -y \
@@ -52,7 +53,8 @@ From: osrf/ros:melodic-desktop-full-bionic
         libegl1-mesa-dev \
         ros-$(rosversion -d)-image-view \
         python-sklearn  \
-        ros-$(rosversion -d)-rqt ros-$(rosversion -d)-rqt-common-plugins
+        ros-$(rosversion -d)-rqt ros-$(rosversion -d)-rqt-common-plugins \
+        python-tk
 
     SIM_LOCATION=/opt/neoslam
 

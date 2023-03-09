@@ -6,7 +6,6 @@ build:
 	catkin build
 
 execute-sim:
-	./scripts/shell/cdb-start-single-node.sh
 	./scripts/tmux/start_simulation.sh
 
 install-sim:

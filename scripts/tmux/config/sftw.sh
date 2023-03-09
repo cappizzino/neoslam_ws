@@ -25,9 +25,6 @@ export HUSKY_LASER_3D_MAX_ANGLE=3.14
 # simulation gazebo GUI
 export SIM_GAZEBO_GUI=1
 
-# LIO-SAM mapping mode
-export LIO_SAM_MAPPING=1
-
 # export HUSKY_LASER_3D_TOWER=1
 # export HUSKY_LASER_3D_XYZ="0 0 0"
 # export HUSKY_LASER_3D_RPY="0 0 0"

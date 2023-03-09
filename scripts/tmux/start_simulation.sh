@@ -29,11 +29,11 @@ MAIN_DIR=~/"bag_files"
 
 # the project name
 # * is used to define folder name in ~/$MAIN_DIR
-PROJECT_NAME=barnbot
+PROJECT_NAME=neoslam
 
 # the name of the TMUX session
 # * can be used for attaching as 'tmux a -t <session name>'
-SESSION_NAME="barnbot"
+SESSION_NAME="neoslam"
 
 # the IP of the server
 # * using this, depending on your use case, might be preferable over 
