@@ -25,7 +25,7 @@
   <!--- Image saver -->
   <node pkg="image_view" type="image_saver" name="image_saver">
     <param name="save_all_image" value="false" />
-    <param name="filename_format" value="$(env HOME)/ros_workspace_dsc/image/image%04d.%s"/>
+    <param name="filename_format" value="$(env HOME)/neoslam_ws/images/image%04d.%s"/>
     <remap from="/image" to="/stereo_camera/left/image_raw"/>
   </node>
 

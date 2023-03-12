@@ -1,6 +1,6 @@
 export SHELL=$( which zsh )
 
-PROMPT='[NeoSlam]%1~ %# '
+PROMPT='[Neoslam]%1~ %# '
 
 source /opt/ros/$ROS_DISTRO/setup.zsh
 
@@ -21,6 +21,6 @@ fi
 # source /opt/mrs/mrs_workspace/src/uav_core/miscellaneous/shell_additions/shell_additions.sh
 
 # source the linux setup from within
-if [ -e /opt/neoslam_ws/host/addons.sh ]; then
-  source /opt/neoslam_ws/host/addons.sh
+if [ -e /opt/neoslam/host/addons.sh ]; then
+  source /opt/neoslam/host/addons.sh
 fi

@@ -52,9 +52,9 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1='[BarnBot] ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    PS1='[Neoslam] ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 else
-    PS1='[BarnBot] ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+    PS1='[Neoslam] ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
 unset color_prompt force_color_prompt
 
@@ -119,7 +119,7 @@ if [ -e /opt/ros/$ROS_DISTRO/setup.bash ]; then
 fi
 
 # source the user_workspace, if it exists
-[ -e ~/barnbot_ws/devel/setup.bash ] && source ~/barnbot_ws/devel/setup.bash
+[ -e ~/neoslam_ws/devel/setup.bash ] && source ~/neoslam_ws/devel/setup.bash
 
 [ -z "$ROS_PORT" ] && export ROS_PORT=11311
 [ -z "$ROS_MASTER_URI" ] && export ROS_MASTER_URI=http://localhost:$ROS_PORT
@@ -135,6 +135,6 @@ if ! ([[ "$INFO_OS" == *"Ubuntu"* ]] && [[ "$INFO_OS" == *"20.04"* ]]); then
 fi
 
 # source the shell addons if exists
-if [ -e /opt/barnbot/host/addons.sh ]; then
-  source /opt/barnbot/host/addons.sh
+if [ -e /opt/neoslam/host/addons.sh ]; then
+  source /opt/neoslam/host/addons.sh
 fi

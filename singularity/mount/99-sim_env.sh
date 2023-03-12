@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SIM_LOCATION=/opt/neoslam_ws
+SIM_LOCATION=/opt/neoslam
 
 # link bash and zsh rc files
 [ ! -e ~/.bashrc ] &&  ln -s $SIM_LOCATION/host/singularity_bashrc.sh ~/.bashrc
@@ -15,4 +15,4 @@ SIM_LOCATION=/opt/neoslam_ws
 
 touch ~/.sudo_as_admin_successful
 
-export PS1="[NeoSlam] ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+export PS1="[Neoslam] ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "

@@ -11,7 +11,7 @@ IMAGES_PATH=$REPO_PATH/images
 ## | ------------------------ paths end ----------------------- |
 
 TO_SANDBOX=true # set to false to reverse the direction
-IMAGE_NAME=barnbot
+IMAGE_NAME=neoslam
 
 ## | ------------------- do not modify below ------------------ |
 

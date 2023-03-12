@@ -10,7 +10,7 @@ OVERLAYS_PATH=$REPO_PATH/overlays
 
 ## | ------------------------ paths end ----------------------- |
 
-OVERLAY_NAME="barnbot.img"
+OVERLAY_NAME="neoslam.img"
 OVERLAY_SIZE=500 # MB
 
 # create the template for overlay file system

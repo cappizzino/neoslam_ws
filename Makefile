@@ -5,8 +5,16 @@ build:
 	catkin config --extend /opt/ros/${ROS_DISTRO}
 	catkin build
 
+execute-sys:
+	./scripts/tmux/start_system.sh
+
 execute-sim:
 	./scripts/tmux/start_simulation.sh
+
+install-sys:
+	wstool update -j ${n_processes} -t src/hw_drivers/
+	wstool update -j ${n_processes} -t src/sw_system/
+	wstool update -j ${n_processes} -t src/sw_monitor/
 
 install-sim:
 	wstool update -j ${n_processes} -t src/sw_simulation/

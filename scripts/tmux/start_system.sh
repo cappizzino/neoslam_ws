@@ -47,7 +47,7 @@ pre_input="mkdir -p $MAIN_DIR/$PROJECT_NAME; \
 export DIR_PATH=$DIR_PATH; \
 source $DIR_PATH/config/hdw.sh; \
 source $DIR_PATH/config/sftw.sh; \
-source $DIR_PATH/addons.sh; \
+source $DIR_PATH/../../singularity/mount/addons.sh; \
 source $DIR_PATH/../../devel/setup.bash"
 
 # define commands
@@ -57,21 +57,14 @@ source $DIR_PATH/../../devel/setup.bash"
 # * NO "new line" after the command => the command will wait for user's <enter>
 input=(
   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-          rosbag play --clock $DIR_PATH/../../singularity/mount/_2022-04-07-14-14-35_robotarium.bag
+          rosbag play --pause --clock $DIR_PATH/../../singularity/mount/_2022-04-07-14-14-35_robotarium.bag
 '
-  'NeoSlam' 'waitForRos; roslaunch neoslam husky_hwu_NeoSLAM.launch 
+  'NeoSlam' 'waitForRos; roslaunch neoslam neoslam.launch
 '
-#   'loop_navigation' 'waitForRos; roslaunch barnbot_launcher loop_navigation.launch
-# '
-#   'kb_teleop' 'waitForRos; rosrun teleop_twist_keyboard teleop_twist_keyboard.py
-# '
-#   'rosbag' 'waitForRos; roslaunch barnbot_launcher rosbag.launch \
-#                           path:="$HOME/bag_files/barnbot/latest/" \
-#                           period:="8h" \
-#                           topics:="/imu /cmd_vel /ground_truth/state /lio_sam/relocalization/fitness_score /lio_sam/relocalization/set_map_to_odom /odom(.*) /cpu_monitor/(.*) (.*)/stamp"
-# '
-#   'roscore' 'checkRos || roscore && exit
-# '
+  'RatSlam' 'waitForRos; roslaunch neoslam ratslam.launch
+'
+  'roscore' 'checkRos || roscore && exit
+'
 )
 
 # the name of the window to focus after start
