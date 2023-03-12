@@ -5,6 +5,13 @@
 #######################################################################################
 # * use this file to source any additional configuration before launch (e.g. SERVER_IP)
 
+# Path CNN model
+export TORCH_HOME='~/neoslam_ws/singularity/mount/model'
+
+# enable Dimension Reduction
+export DIMENSION_REDUCTION=0
+export MATRIX_HOME=$HOME/neoslam_ws/singularity/mount/data 
+
 # disable husky's EKF
 export ENABLE_EKF=false
 

@@ -56,31 +56,26 @@ source $DIR_PATH/../../devel/setup.bash"
 # * "new line" after the command    => the command will be called after start
 # * NO "new line" after the command => the command will wait for user's <enter>
 input=(
-  'Simulation' 'waitForRos; roslaunch barnbot_launcher simulation.launch
+'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
+          rosbag play --clock $DIR_PATH/../../singularity/mount/_2023-02-17-18-01-52_0.bag
 '
-  'LIO-SAM' 'waitForSimulation; roslaunch barnbot_launcher lio_sam.launch
+  'NeoSlam' 'waitForRos; roslaunch neoslam husky_hwu_NeoSLAM.launch 
 '
-  'MoveBaseFlex' 'waitForSimulation; roslaunch barnbot_launcher move_base_flex.launch
-'
-  'loop_navigation' 'waitForRos; roslaunch barnbot_launcher loop_navigation.launch
-'
-  'kb_teleop' 'waitForRos; rosrun teleop_twist_keyboard teleop_twist_keyboard.py
-'
-  'pypc2map' 'waitForRos; roslaunch barnbot_launcher pypc2map.launch
-'
-  'monitor' 'waitForSimulation; roslaunch barnbot_launcher monitor.launch
-'
-  'rosbag' 'waitForRos; roslaunch barnbot_launcher rosbag.launch \
-                          path:="$HOME/bag_files/barnbot/latest/" \
-                          period:="8h" \
-                          topics:="/imu /cmd_vel /ground_truth/state /lio_sam/relocalization/fitness_score /lio_sam/relocalization/set_map_to_odom /odom(.*) /cpu_monitor/(.*) (.*)/stamp"
-'
+#   'loop_navigation' 'waitForRos; roslaunch barnbot_launcher loop_navigation.launch
+# '
+#   'kb_teleop' 'waitForRos; rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+# '
+#   'rosbag' 'waitForRos; roslaunch barnbot_launcher rosbag.launch \
+#                           path:="$HOME/bag_files/barnbot/latest/" \
+#                           period:="8h" \
+#                           topics:="/imu /cmd_vel /ground_truth/state /lio_sam/relocalization/fitness_score /lio_sam/relocalization/set_map_to_odom /odom(.*) /cpu_monitor/(.*) (.*)/stamp"
+# '
   'roscore' 'checkRos || roscore && exit
 '
 )
 
 # the name of the window to focus after start
-init_window="Simulation"
+init_window="PlayDataset"
 
 # automatically attach to the new session?
 # {true, false}, default true

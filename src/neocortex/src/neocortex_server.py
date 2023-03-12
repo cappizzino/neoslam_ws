@@ -121,9 +121,8 @@ class ActionServer():
         # Load Matrix - Dimension Reduction and binarizarion
         # ****************************************
         rospy.loginfo("Dimension Reduction")
-        createMatrix = 1
-        out_dir = os.path.dirname(__file__)
-        out_dir = os.path.join(out_dir, 'data')
+        createMatrix = os.getenv("DIMENSION_REDUCTION", default=1)
+        out_dir = os.getenv("MATRIX_HOME")
         if createMatrix == 1:
             self.matrix_p = np.random.randn(64896, 1024)
             self.matrix_p = normc(self.matrix_p)
