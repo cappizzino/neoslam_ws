@@ -1,2 +1,2 @@
 # SSH authentication
-SSH key-pair generated for repository access within the singularity container. This key's public pair should be set as a "deploy key" with read access on the BarnBot's required repositories.
+SSH key-pair generated for repository access within the singularity container. This key's public pair should be set as a "deploy key" with read access on the Ranger's required repositories.

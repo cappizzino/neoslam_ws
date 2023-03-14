@@ -22,6 +22,9 @@ IMAGES_PATH="$SINGULARITY_PATH/images"
 OVERLAYS_PATH="$SINGULARITY_PATH/overlays"
 MOUNT_PATH="$SINGULARITY_PATH/mount"
 
+# defines the path for persistent storage of datasets
+BAGS_PATH="$HOME/bag_files"
+
 ## | ----------------------- user config ---------------------- |
 
 # use <file>.sif for normal container
@@ -38,12 +41,19 @@ USE_NVIDIA=false # true: will tell Singularity that it should use nvidia graphic
 OVERLAY=false  # true: will load persistant overlay (overlay can be created with scripts/create_overlay.sh)
 WRITABLE=false # true: will run it as --writable (works with --sandbox containers, image can be converted with scripts/convert_sandbox.sh)
 
+# create a directory to mount into the container to hold the output datasets
+[ -d "$BAGS_PATH" ] || mkdir "$BAGS_PATH"
+
 # definy what should be mounted from the host to the container
 # [TYPE], [SOURCE (host)], [DESTINATION (container)]
 MOUNTS=(
   # mount the custom user workspace into the container
   #                  HOST PATH                                    CONTAINER PATH
   "type=bind" "$WORKSPACE_PATH" "/home/$USER/neoslam_ws"
+
+  # mount the datasets' directory into the container, DO NOT MODIFY
+  # (this is essential to make the output datasets persistent)
+  "type=bind" "$BAGS_PATH" "/home/$USER/bag_files"
 
   # mount the MRS shell additions into the container, DO NOT MODIFY
   "type=bind" "$MOUNT_PATH" "/opt/neoslam/host"

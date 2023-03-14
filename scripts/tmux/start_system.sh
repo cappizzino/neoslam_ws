@@ -45,8 +45,8 @@ SESSION_IP=$(hostname -I | awk '{print $1}')
 # * do NOT put ; at the end
 pre_input="mkdir -p $MAIN_DIR/$PROJECT_NAME; \
 export DIR_PATH=$DIR_PATH; \
-source $DIR_PATH/config/hdw.sh; \
-source $DIR_PATH/config/sftw.sh; \
+source $DIR_PATH/config/system_hw.sh; \
+source $DIR_PATH/config/system_sw.sh; \
 source $DIR_PATH/../../singularity/mount/addons.sh; \
 source $DIR_PATH/../../devel/setup.bash"
 
