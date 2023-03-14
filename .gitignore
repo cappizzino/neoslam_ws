@@ -59,8 +59,8 @@ CATKIN_IGNORE
 .catkin_workspace
 
 # jpg files
-image/*.jpg
-*.ini
+images/*.jpg
+images/*.ini
 
 # BAG
 *.bag
