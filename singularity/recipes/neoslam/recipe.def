@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: osrf/ros:melodic-desktop-full-bionic
+From: osrf/ros:melodic-desktop-full
 
 # Container RUNTIME setup of environment.
 # NOTE: These variables are not made available during BUILD
@@ -16,6 +16,7 @@ From: osrf/ros:melodic-desktop-full-bionic
         ros-$ROS_DISTRO-gazebo-ros-pkgs \
         ros-$ROS_DISTRO-gazebo-ros-control \
         ros-$ROS_DISTRO-husky-desktop \
+        ros-$ROS_DISTRO-husky-gazebo \
         ros-$ROS_DISTRO-husky-simulator \
         ros-$ROS_DISTRO-teleop-twist-keyboard \
         dbus

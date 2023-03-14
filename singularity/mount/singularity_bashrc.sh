@@ -1,4 +1,4 @@
-export SHELL=/usr/bin/bash
+export SHELL=/bin/bash
 
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
@@ -129,7 +129,7 @@ fi
 
 # if host pc is not Ubuntu 20.04
 OS_INFO=$(cat /proc/version)
-if ! ([[ "$INFO_OS" == *"Ubuntu"* ]] && [[ "$INFO_OS" == *"20.04"* ]]); then
+if ! ([[ "$OS_INFO" == *"Ubuntu"* ]] && [[ "$OS_INFO" == *"20.04"* ]]); then
   export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
   source /usr/share/gazebo/setup.bash
 fi

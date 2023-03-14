@@ -1,7 +1,7 @@
 <launch>
 
-  <node name="RatSLAMPoseCells" pkg="ratslam_ros" type="ratslam_pc" args="$(find ratslam_ros)/config/config_husky_hwu.txt.in _image_transport:=raw" cwd="node" required="true" />
-
-	<node name="RatSLAMExperienceMap" pkg="ratslam_ros" type="ratslam_em" args="$(find ratslam_ros)/config/config_husky_hwu.txt.in _image_transport:=raw" cwd="node" required="true" />
+  <node name="RatSLAMPoseCells" pkg="ratslam_ros" type="ratslam_pc" args="$(find ratslam_ros)/config/config_husky_hwu.txt _image_transport:=raw" cwd="node" required="true" />
+  
+  <node name="RatSLAMExperienceMap" pkg="ratslam_ros" type="ratslam_em" args="$(find ratslam_ros)/config/config_husky_hwu.txt _image_transport:=raw" cwd="node" required="true" />
 
 </launch>

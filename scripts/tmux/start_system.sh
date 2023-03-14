@@ -57,7 +57,7 @@ source $DIR_PATH/../../devel/setup.bash"
 # * NO "new line" after the command => the command will wait for user's <enter>
 input=(
   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-          rosbag play --pause --clock $DIR_PATH/../../singularity/mount/_2022-04-07-14-14-35_robotarium.bag
+          rosbag play --pause --clock $DIR_PATH/../../ros_bags/_2022-04-07-14-14-35_robotarium.bag
 '
   'NeoSlam' 'waitForRos; roslaunch neoslam neoslam.launch
 '
