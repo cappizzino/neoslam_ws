@@ -14,13 +14,8 @@ A Makefile was also included for convenience. **This is the recommended way to s
 ## Requirements
 
 **In case you do not wish to install the system natively**, a set of [Singularity recipes](singularity/recipes/) were implemented to contain the system's installation. In such case, please refer to the following [README](singularity/README.md) after completing the following preparation steps:
-1. The repository uses a SSH key to allow updating the workspace from within the container. To use it, execute this first:
-    ```bash
-    chmod 400 singularity/mount/ssh/id_rsa
-    ```
-2. Install Singularity. This can be achieved through the [install_singularity.sh](scripts/shell/install_singularity.sh) script.
 
-**Make, TMUX, wstool, catkin_tools:**
+1. Install Make, TMUX, wstool, catkin_tools:
 ```bash
 sudo apt install make                       # *if not already installed in your system*
 sudo apt install tmux xclip                 # terminal multiplexer (alternative to GNU screen)
@@ -28,27 +23,14 @@ sudo apt install python-wstool              # workspace version control tool
 sudo apt install python-catkin-tools        # catkin_tools to build the workspace
 ```
 
-**Other dependencies:**
+2. Install Singularity. This can be achieved through the [install_singularity.sh](scripts/shell/install_singularity.sh) script or
+
 ```bash
 make install-deps                           # this will take care of source / binary installations in your system. For more information check the shell scripts.
 ```
 
-
-## Installation
-To install the workspace,
-```bash
-# system packages
-make install-sys
-
-# OR
-
-# simulation packages
-make install-sim
-```
-
-
-## Launch the system
-To launch the simulation,
+### Launch the system
+To launch the simulation (WIP),
 ```bash
 make execute-sim
 ```
