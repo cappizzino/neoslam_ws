@@ -40,11 +40,11 @@ using namespace std;
 #include <ratslam_ros/ViewTemplate.h>
 
 
-#if HAVE_IRRLICHT
+//#if HAVE_IRRLICHT
 #include "graphics/posecell_scene.h"
 ratslam::PosecellScene *pcs;
 bool use_graphics;
-#endif
+//#endif
 
 using namespace ratslam;
 
@@ -74,13 +74,13 @@ void odo_callback(nav_msgs::OdometryConstPtr odo, ratslam::PosecellNetwork *pc, 
     }
 
 
-#ifdef HAVE_IRRLICHT
+//#ifdef HAVE_IRRLICHT
 	if (use_graphics)
 	{
 		pcs->update_scene();
 		pcs->draw_all();
 	}
-#endif
+//#endif
   }
   prev_time = odo->header.stamp;
 }
@@ -91,13 +91,13 @@ void template_callback(ratslam_ros::ViewTemplateConstPtr vt, ratslam::PosecellNe
 
   pc->on_view_template(vt->current_id, vt->relative_rad);
 
-#ifdef HAVE_IRRLICHT
+//#ifdef HAVE_IRRLICHT
 	if (use_graphics)
 	{
 		pcs->update_scene();
 		pcs->draw_all();
 	}
-#endif
+//#endif
 
 }
 
@@ -138,7 +138,7 @@ int main(int argc, char * argv[])
                                                                     ros::TransportHints().tcpNoDelay());
   ros::Subscriber sub_template = node.subscribe<ratslam_ros::ViewTemplate>(topic_root + "/LocalView/Template", 0, boost::bind(template_callback, _1, pc, &pub_pc),
                                                                            ros::VoidConstPtr(), ros::TransportHints().tcpNoDelay());
-#ifdef HAVE_IRRLICHT
+//#ifdef HAVE_IRRLICHT
   boost::property_tree::ptree draw_settings;
   get_setting_child(draw_settings, settings, "draw", true);
   get_setting_from_ptree(use_graphics, draw_settings, "enable", true);
@@ -146,7 +146,7 @@ int main(int argc, char * argv[])
   {
 	pcs = new ratslam::PosecellScene(draw_settings, pc);
   }
-#endif
+//#endif
 
   ros::spin();
 

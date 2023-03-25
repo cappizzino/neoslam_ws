@@ -8,7 +8,7 @@
 # Path CNN model
 export TORCH_HOME='~/neoslam_ws/singularity/mount/model'
 
-# Enable Dimension Reduction
+# Enable Dimension Reduction creation
 export DIMENSION_REDUCTION=0
 export MATRIX_HOME=$HOME/neoslam_ws/singularity/mount/data
 

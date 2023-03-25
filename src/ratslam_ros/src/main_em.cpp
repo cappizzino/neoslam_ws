@@ -51,11 +51,11 @@ geometry_msgs::PoseStamped pose_output;
 ratslam_ros::TopologicalMap em_map;
 visualization_msgs::Marker em_marker;
 
-#ifdef HAVE_IRRLICHT
+//#ifdef HAVE_IRRLICHT
 #include "graphics/experience_map_scene.h"
 ratslam::ExperienceMapScene *ems;
 bool use_graphics;
-#endif
+//#endif
 
 using namespace ratslam;
 
@@ -227,13 +227,13 @@ void action_callback(ratslam_ros::TopologicalActionConstPtr action, ratslam::Exp
 
   pub_em_markers.publish(em_marker);
 
-#ifdef HAVE_IRRLICHT
+//#ifdef HAVE_IRRLICHT
   if (use_graphics)
   {
     ems->update_scene();
     ems->draw_all();
   }
-#endif
+//#endif
 }
 
 void set_goal_pose_callback(geometry_msgs::PoseStampedConstPtr pose, ratslam::ExperienceMap * em)
@@ -284,7 +284,7 @@ int main(int argc, char * argv[])
   ros::Subscriber sub_goal = node.subscribe<geometry_msgs::PoseStamped>(topic_root + "/ExperienceMap/SetGoalPose", 0, boost::bind(set_goal_pose_callback, _1, em),
                                                                         ros::VoidConstPtr(), ros::TransportHints().tcpNoDelay());
 
-#ifdef HAVE_IRRLICHT
+//#ifdef HAVE_IRRLICHT
   boost::property_tree::ptree draw_settings;
   get_setting_child(draw_settings, settings, "draw", true);
   get_setting_from_ptree(use_graphics, draw_settings, "enable", true);
@@ -292,7 +292,7 @@ int main(int argc, char * argv[])
   {
     ems = new ratslam::ExperienceMapScene(draw_settings, em);
   }
-#endif
+//#endif
 
   ros::spin();
 
