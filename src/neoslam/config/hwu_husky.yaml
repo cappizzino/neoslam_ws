@@ -1,17 +1,17 @@
-# Bag file
-bag_topic_01: "/stereo_camera/left/image_raw"
-bag_topic_02: "/odometry/filtered"
+# Tempory Memory - value="apical / distal"
+tempory_memory: "distal"
 
 # Preprocessing
 image_filter: "clahe" # gauss clahe none
+
+# Plot tests
 plot_test: "no" # no yes
 plot_test_cnn: "no"
 
-# Local View topic 
+# topics
+image_topic: "/stereo_camera/left/image_raw"
 topic_local_view: '/husky_hwu/LocalView/Template'
-
-# Tempory Memory - value="apical / distal"
-tempory_memory: "distal"
+bag_topic_02: "/odometry/filtered"
 
 # Cortical Grid Cells
 PC_DIM_XY: 11

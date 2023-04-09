@@ -6,14 +6,23 @@
 # * use this file to source any additional configuration before launch (e.g. SERVER_IP)
 
 # Path CNN model
-export TORCH_HOME='~/neoslam_ws/singularity/mount/model'
+export TORCH_HOME=$HOME/neoslam_ws/singularity/mount/model/checkpoints
 
 # Enable Dimension Reduction creation
 export DIMENSION_REDUCTION=0
 export MATRIX_HOME=$HOME/neoslam_ws/singularity/mount/data
 
+# Image path
+export SYS_IMAGE_ENABLED=1  # enable / disable image recording
+export SYS_IMAGE_PATH="$HOME/bag_files/neoslam/latest/images/"
+export SYS_IMAGE_ARGS="
+    --save_all_image=false
+    --filename_format=$SYS_IMAGE_PATH/image%04d.%s
+"
+export SYS_IMAGE_TOPICS=/stereo_camera/left/image_raw
+
 # ROS bag
-export SYS_ROSBAG_ENABLED=0     # enable / disable bag recording (be careful to NOT run long term experiments without bags!)
+export SYS_ROSBAG_ENABLED=1     # enable / disable bag recording (be careful to NOT run long term experiments without bags!)
 export SYS_ROSBAG_SIZE='0'      # max size before splitting in Mb (i.e. 0 = infinite, 1024 = 1024Mb = 1Gb)
 export SYS_ROSBAG_DURATION='8h'
 export SYS_ROSBAG_PATH="$HOME/bag_files/neoslam/latest/"
@@ -29,18 +38,10 @@ export SYS_ROSBAG_TOPICS="
     /imu
     /cmd_vel
     /husky(.*)
+    /feats_cnn
+    /feats_htm 
+    /feats_lsbh 
+    /info
 "
-
-# lio_sam configs
-# NOTE: Keep 'LIO_SAM_MAPPING=1'. In the ranger's use-case we have the GPS's global reference.
-# Relocalization was built under the assumption that there is not any GPS factor being added.
-# Follow https://redmine.ingeniarius.pt/issues/2520 for more information.
-export LIO_SAM_MAPPING=1    # enable / disable LIO_SAM's mapping mode
-export LIO_SAM_RVIZ=1       # enable / disable LIO_SAM's rviz
-
-# map server
-export MAP_SERVER_ENABLED=0                 # enable / disable map server
-export MAP_SERVER_MAP_NAME='IngeniariusHQ'  # the name of the saved map (e.g. IngeniariusHQ)
-
 # ROS specific configs
 export ROSCONSOLE_FORMAT='[${severity}] [${node}] [${function}] [${line}]: ${message}'

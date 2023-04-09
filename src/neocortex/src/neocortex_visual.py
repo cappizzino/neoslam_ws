@@ -12,12 +12,12 @@ class VisualEye(object):
         # ****************************************
         # Load Parameters
         # ****************************************
-        bag_topic_01 = rospy.get_param('bag_topic_01')
+        image_topic = rospy.get_param('image_topic')
 
         # ****************************************
         # Subscriber
         # ****************************************
-        self.image_sub = rospy.Subscriber(bag_topic_01, Image, self.callback, queue_size=1)
+        self.image_sub = rospy.Subscriber(image_topic, Image, self.callback, queue_size=1)
         
         # ****************************************
         # Create service client

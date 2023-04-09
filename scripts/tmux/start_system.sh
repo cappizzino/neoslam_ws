@@ -63,6 +63,8 @@ input=(
 '
   'RatSlam' 'waitForRos; roslaunch neoslam ratslam.launch
 '
+  'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
+'
   'roscore' 'checkRos || roscore && exit
 '
 )

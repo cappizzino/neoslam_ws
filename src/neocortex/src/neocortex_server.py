@@ -5,6 +5,7 @@ import time
 import actionlib
 from neocortex.msg import NeocortexViewCellAction, NeocortexViewCellFeedback, NeocortexViewCellResult
 from std_msgs.msg import ByteMultiArray as BIN
+from std_msgs.msg import Float32MultiArray as FLOAT
 from neocortex.msg import ViewTemplate, infoExp
 from viewcell.view_cell import ViewCells
 from gridcell.grid_cell import GridCells
@@ -42,7 +43,7 @@ class ActionServer():
         self.image_filter = rospy.get_param('image_filter')
         self.plot_test = rospy.get_param('plot_test')
         self.plot_test_cnn = rospy.get_param('plot_test_cnn')
-        topic_local_view = rospy.get_param('topic_local_view')
+        self.topic_local_view = rospy.get_param('topic_local_view')
 
 
         # ****************************************
@@ -144,7 +145,8 @@ class ActionServer():
 
         # ****************************************
         # Variables
-        # ****************************************  
+        # ****************************************
+        self.feats_cnn  = FLOAT()
         self.feats_lsbh = BIN()
         self.feats_htm = BIN()
         self.feats_htm_map = []
@@ -163,7 +165,8 @@ class ActionServer():
         # ****************************************
         # Define Publishers
         # ****************************************
-        self.pub_vt = rospy.Publisher(topic_local_view, ViewTemplate, queue_size=1)
+        self.pub_vt = rospy.Publisher(self.topic_local_view, ViewTemplate, queue_size=1)
+        self.features_cnn = rospy.Publisher('/feats_cnn', FLOAT, queue_size=1)
         self.features_lsbh = rospy.Publisher('/feats_lsbh', BIN, queue_size=1)
         self.features_htm = rospy.Publisher('/feats_htm', BIN, queue_size=1)
         self.info = rospy.Publisher('/info', infoExp, queue_size=1)
@@ -241,6 +244,9 @@ class ActionServer():
         output_flatten = output_flatten.flatten('C')
         #output_flatten = output_flatten / np.linalg.norm(output_flatten)
         features_vector = np.array(output_flatten, ndmin=2)
+        # Send cnn features
+        self.feats_cnn.data = features_vector[0]
+        self.publish_cnn(self.feats_cnn)
 
         # ****************************************
         # sLSBH (binarized descriptors)
@@ -285,7 +291,7 @@ class ActionServer():
             self.Du = self.Du + d1_htm[0]
         
         n_perc = ((np.count_nonzero(self.Du))/d1_htm.shape[1])*100
-        print(n_perc)
+        rospy.loginfo("Sparsity: %f", n_perc)
 
         # ****************************************
         # Map HTM
@@ -342,6 +348,10 @@ class ActionServer():
         rospy.loginfo(time_exec)
 
         rate.sleep()
+
+    def publish_cnn(self, data):
+        'Publish CNN features'
+        self.features_cnn.publish(data)
 
     def publish_lsbh(self, data):
         'Publish LSBH features'
