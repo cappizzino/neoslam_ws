@@ -7,15 +7,4 @@
   <node pkg="neocortex" name="neocortex_client" type="neocortex_visual.py" output="screen">
   </node>
 
-  <!--- rqt view -->
-  <node pkg="rqt_image_view" type="rqt_image_view" name="image_view_debug" args="/stereo_camera/left/image_raw"/>
-
-
-  <!--- Image saver -->
-  <node pkg="image_view" type="image_saver" name="image_saver">
-    <param name="save_all_image" value="false" />
-    <param name="filename_format" value="$(env HOME)/neoslam_ws/images/image%04d.%s"/>
-    <remap from="/image" to="/stereo_camera/left/image_raw"/>
-  </node>
-
 </launch>

@@ -57,13 +57,17 @@ source $DIR_PATH/../../devel/setup.bash"
 # * NO "new line" after the command => the command will wait for user's <enter>
 input=(
   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-          rosbag play --pause --clock $DIR_PATH/../../ros_bags/_2022-04-07-14-14-35_robotarium.bag --topics /stereo_camera/left/image_raw /husky_hwu/odom /odometry/filtered 
+          rosbag play --pause --clock $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /husky_hwu/odom /odometry/filtered 
 '
   'NeoSlam' 'waitForRos; roslaunch neoslam neoslam.launch
 '
   'RatSlam' 'waitForRos; roslaunch neoslam ratslam.launch
 '
   'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
+'
+  'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver|| exit
+'
+  'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:=$SYS_IMAGE_TOPIC || exit
 '
   'roscore' 'checkRos || roscore && exit
 '

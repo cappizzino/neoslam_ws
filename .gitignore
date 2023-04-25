@@ -70,3 +70,6 @@ images/*.ini
 
 # Data Matrix reduction
 *.npy
+
+# Experiment folders
+/scripts/matlab/experiments/*

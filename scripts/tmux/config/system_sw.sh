@@ -12,20 +12,27 @@ export TORCH_HOME=$HOME/neoslam_ws/singularity/mount/model/checkpoints
 export DIMENSION_REDUCTION=0
 export MATRIX_HOME=$HOME/neoslam_ws/singularity/mount/data
 
-# Image path
+# Image Topic
+export SYS_IMAGE_TOPIC=/stereo_camera/left/image_raw
+
+# Image Saver
 export SYS_IMAGE_ENABLED=1  # enable / disable image recording
-export SYS_IMAGE_PATH="$HOME/bag_files/neoslam/latest/images/"
-export SYS_IMAGE_ARGS="
-    --save_all_image=false
-    --filename_format=$SYS_IMAGE_PATH/image%04d.%s
-"
-export SYS_IMAGE_TOPICS=/stereo_camera/left/image_raw
+export SYS_IMAGE_ARGS=_save_all_image:=false
+export SYS_IMAGE_PATH=_filename_format:="$HOME/bag_files/neoslam/latest/image%04d.%s"
+
+# Image Viewer
+export SYS_RQT_VIEWER_ENABLED=1
 
 # ROS bag
 export SYS_ROSBAG_ENABLED=1     # enable / disable bag recording (be careful to NOT run long term experiments without bags!)
-export SYS_ROSBAG_SIZE='0'      # max size before splitting in Mb (i.e. 0 = infinite, 1024 = 1024Mb = 1Gb)
+export SYS_ROSBAG_SIZE='1024'      # max size before splitting in Mb (i.e. 0 = infinite, 1024 = 1024Mb = 1Gb)
 export SYS_ROSBAG_DURATION='8h'
 export SYS_ROSBAG_PATH="$HOME/bag_files/neoslam/latest/"
+
+# Experiment  
+#export SYS_ROSBAG_NAME=_2022-04-07-11-19-55_outdoor_morning.bag
+export SYS_ROSBAG_NAME=_2022-04-07-11-08-05_corridor.bag
+#export SYS_ROSBAG_NAME=_2022-04-07-14-14-35_robotarium.bag
 
 export SYS_ROSBAG_ARGS="
     --regex
