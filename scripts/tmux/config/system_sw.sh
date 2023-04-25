@@ -18,7 +18,7 @@ export SYS_IMAGE_TOPIC=/stereo_camera/left/image_raw
 # Image Saver
 export SYS_IMAGE_ENABLED=1  # enable / disable image recording
 export SYS_IMAGE_ARGS=_save_all_image:=false
-export SYS_IMAGE_PATH=_filename_format:="$HOME/bag_files/neoslam/latest/image%04d.%s"
+export SYS_IMAGE_PATH=_filename_format:="$HOME/bag_files/neoslam/latest/images/image%04d.%s"
 
 # Image Viewer
 export SYS_RQT_VIEWER_ENABLED=1

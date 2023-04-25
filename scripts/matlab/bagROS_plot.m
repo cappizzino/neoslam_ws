@@ -1,25 +1,26 @@
 close all
 clearvars
+warning('off', 'MATLAB:MKDIR:DirectoryExists');
 
-exp = 'outdoor_afternoon'; % 'robotarium'; % 'corridor' %'outdoor_afternoon'
+exp = 'corridor'; % 'robotarium'; % 'corridor' %'outdoor_afternoon'
 
-filesSaved = 1;
+filesSaved = 0;
 plotConfig = 1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 switch exp
     case 'robotarium'
-        file =  'E:\dataset\output\robotarium\husky_out_cnn.bag';
+        file = fullfile('experiments','robotarium','.bag');
         offset1 = 10;
         offset2 = 20;
         theta = -58;%-56;
     case 'corridor'
-        file = 'E:\dataset\output\corridor\husky_out.bag';
+        file = fullfile('experiments','corridor','_2023-04-25-13-09-50_0.bag');
         offset1 = 1;
         offset2 = 1;
         theta = 0;
     case 'outdoor_afternoon'
-        file = 'E:\dataset\output\outdoor_afternoon\husky_out_after01.bag';
+        file = fullfile('experiments','outdoor_afternoon','.bag');
         offset1 = 1;
         offset2 = 1;
         theta = 60;
@@ -29,6 +30,7 @@ switch exp
 end
 
 bag = rosbag(file);
+mkdir(fullfile(pwd,'experiments',exp,'outputFiles'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 data_odom = select(bag,'Topic','/husky_hwu/odom');
@@ -74,9 +76,9 @@ if plotConfig == 1
     set(f1, 'Position', [pos(1) pos(2) width*100, height*100]);
     set(ff1, 'FontSize', fsz, 'LineWidth', alw); %<- Set properties
 
-    fileName = fullfile(pwd,'outputFiles', exp);
-    figname11 = [strcat(fileName,'\',exp,'_pos') '.jpg'];
-    figname12 = [strcat(fileName,'\',exp,'_pos_eps') '.eps'];
+    
+    figname11 = fullfile(pwd,'experiments',exp,'outputFiles',strcat(exp,'_pos.jpg'));
+    figname12 = fullfile(pwd,'experiments',exp,'outputFiles',strcat(exp,'_pos_eps.eps'));
 
     if filesSaved == 1
         exportgraphics(f1,figname11)
@@ -130,9 +132,8 @@ if plotConfig == 1
     set(f2, 'Position', [pos(1) pos(2) width*100, height*100]);
     set(ff2, 'FontSize', fsz, 'LineWidth', alw); %<- Set properties
 
-    fileName = fullfile(pwd,'outputFiles', exp);
-    figname21 = [strcat(fileName,'\',exp,'_conf') '.jpg'];
-    figname22 = [strcat(fileName,'\',exp,'_conf_eps') '.eps'];
+    figname21 = fullfile(pwd,'experiments',exp,'outputFiles',strcat(exp,'_conf.jpg'));
+    figname22 = fullfile(pwd,'experiments',exp,'outputFiles',strcat(exp,'_conf_eps.eps'));
 
     if filesSaved == 1
         exportgraphics(f2,figname21)
@@ -171,9 +172,8 @@ if plotConfig == 1
     set(f3, 'Position', [pos(1) pos(2) width*100, height*100]);
     set(ff3, 'FontSize', fsz, 'LineWidth', alw); %<- Set properties
 
-    fileName = fullfile(pwd,'outputFiles', exp);
-    figname31 = [strcat(fileName,'\',exp,'_vc') '.jpg'];
-    figname32 = [strcat(fileName,'\',exp,'_vc_eps') '.eps'];
+    figname31 = fullfile(pwd,'experiments',exp,'outputFiles',strcat(exp,'_vc.jpg'));
+    figname32 = fullfile(pwd,'experiments',exp,'outputFiles',strcat(exp,'_vc_eps.eps'));
 
     if filesSaved == 1
         exportgraphics(f3,figname31)
@@ -256,9 +256,8 @@ if plotConfig == 1
     set(f4, 'Position', [pos(1) pos(2) width*100, height*100]);
     set(ff4, 'FontSize', fsz, 'LineWidth', alw); %<- Set properties
 
-    fileName = fullfile(pwd,'outputFiles', exp);
-    figname41 = [strcat(fileName,'\',exp,'_em') '.jpg'];
-    figname42 = [strcat(fileName,'\',exp,'_em_eps') '.eps'];
+    figname41 = fullfile(pwd,'experiments',exp,'outputFiles',strcat(exp,'_em.jpg'));
+    figname42 = fullfile(pwd,'experiments',exp,'outputFiles',strcat(exp,'_em_eps.eps'));
 
     if filesSaved == 1
         exportgraphics(f4,figname41)
@@ -313,157 +312,3 @@ data_info = select(bag,'Topic','/info');
 info = readMessages(data_info,'DataFormat','struct');
 info_id = cellfun(@(m) uint32(m.CurrentViewCell),info,'UniformOutput',false);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% bSe_im = select(bag,'Topic','/husky_hwu/processed_image');
-% msg_im = readMessages(bSe_im);
-% 
-% % for j=1:size(msg_im,1)
-% % 
-% %     if j > offset1
-% %         [img_d,alpha_d] = readImage(msg_im{j});
-% %         [img_q,alpha_q] = readImage(msg_im{id(j)});
-% %     
-% %         position =  [1 50];
-% %     
-% %         husky_image_d = insertText(img_d,position,j,'AnchorPoint','LeftBottom');
-% %         husky_image_q = insertText(img_q,position,id(j),'AnchorPoint','LeftBottom');
-% %     
-% %         figure(4)
-% %         imshow([husky_image_d,husky_image_q])
-% %         title('Images');
-% %     
-% %         pause(1)
-% %         clear husky_image_d husky_image_q
-% %     end
-% % end
-% 
-% %(A) Experiment environment. (B) Visual odomerty. 
-% %(C) Experience map based on RatSLAM. (D) Experience map of FT model-based RatSLAM.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% bSel_ta = select(bag,'Topic','/husky_hwu/PoseCell/TopologicalAction');
-% msg_ta = readMessages(bSel_ta,'DataFormat','struct');
-% 
-% actions = cellfun(@(m) [m.Action, m.SrcId, m.DestId], msg_ta, 'UniformOutput', false);
-% actions = cell2mat(actions);
-% actions_vp_idx = uint16(find(actions(:,1)==2));
-% actions_vp = actions(actions_vp_idx,:);
-% 
-% vpr_merge = select_vp(actions_vp);
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% i=24; j=147;
-% 
-% f4 = figure(4);
-% imshow(select_img(i, j, msg_im))
-% title('True Positive Image');
-% 
-% width = 7;      % Width in inches
-% height = 3;     % Height in inches
-% alw = 0.75;     % AxesLineWidth
-% fsz = 9;        % Fontsize
-% lw = 1.5;       % LineWidth
-% msz = 8;        % MarkerSize
-% 
-% pos = get(f4, 'Position');
-% ff4 = get(f4,'Children');
-% 
-% set(f4, 'Position', [pos(1) pos(2) width*100, height*100]);
-% set(ff4, 'FontSize', fsz, 'LineWidth', alw); %<- Set properties
-% 
-% fileName = fullfile(pwd,'outputFiles', exp);
-% figname41 = [strcat(fileName,'\',exp,'_tp') '.jpg'];
-% figname42 = [strcat(fileName,'\',exp,'_tp_eps') '.eps'];
-% 
-% if filesSaved == 1
-% 	exportgraphics(f4,figname41)
-% 	exportgraphics(f4,figname42)
-% end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% i=54; j=163;
-% figure(5)
-% imshow(select_img(i, j, msg_im))
-% title('True Positive Image');
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% i=64; j=170;
-% 
-% f6 = figure(6);
-% imshow(select_img(i, j, msg_im))
-% title('False Positive Image');
-% 
-% width = 7;      % Width in inches
-% height = 3;     % Height in inches
-% alw = 0.75;     % AxesLineWidth
-% fsz = 9;        % Fontsize
-% lw = 1.5;       % LineWidth
-% msz = 8;        % MarkerSize
-% 
-% 
-% pos = get(f6, 'Position');
-% ff6 = get(f6,'Children');
-% 
-% set(f6, 'Position', [pos(1) pos(2) width*100, height*100]);
-% set(ff6, 'FontSize', fsz, 'LineWidth', alw); %<- Set properties
-% 
-% fileName = fullfile(pwd,'outputFiles', exp);
-% figname61 = [strcat(fileName,'\',exp,'_fp') '.jpg'];
-% figname62 = [strcat(fileName,'\',exp,'_fp_eps') '.eps'];
-% 
-% if filesSaved == 1
-% 	exportgraphics(f6,figname61)
-% 	exportgraphics(f6,figname62)
-% end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% places = [actions_vp(:,2); actions_vp(:,3)];
-% places = sort(places);
-% places = unique(places);
-% places_number = size(places,1);
-% place_cell = {};
-% 
-% for i=1:places_number
-%     place_cell(i,1) = {places(i)};
-%     
-%     places_cell_idx = find(actions_vp(:,2)==places(i));
-%     place_cell{i,2} = actions_vp(places_cell_idx,3)';
-%     
-%     places_cell_idx = find(actions_vp(:,3)==places(i));
-%     place_cell{i,3} = actions_vp(places_cell_idx,2)';
-% end
-% 
-% vpr = {};
-% 
-% for i=1:places_number 
-%     c = [place_cell{i,1},place_cell{i,2},place_cell{i,3}];
-%     c = sort(c);
-%     c = unique(c);
-%     vpr{i} = c;
-% end
-% 
-% inter = eye(places_number);
-% 
-% for i=1:places_number
-%     for j=i:places_number
-%         aux = intersect(vpr{i},vpr{j});
-%         if  ~isempty(aux)
-%             %aux2 = [vpr{i},vpr{j}];
-%             %aux2 = sort(aux2);
-%             %aux2 = unique(aux2);
-%             %vpr_merge{w} = aux2;
-%             %w = w + 1;
-%             inter(i,j) = 1;
-%         end
-%     end
-% end
-% 
-% vpr_merge = {};
-% for i=1:places_number
-%     vpr_merge {i} = find(inter(i,:));
-% end

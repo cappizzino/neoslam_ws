@@ -327,6 +327,7 @@ class ActionServer():
         # Send info
         # ****************************************
         self.info_exp.current_img = self.count-1
+        self.info_exp.current_vc = cell_vc.id
         self.info_exp.current_view_cell = cell_vc.imgs
         self.info_exp.time_exec = time_exec
         self.publish_info(self.info_exp)
