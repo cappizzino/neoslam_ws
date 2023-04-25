@@ -12,12 +12,13 @@ class VisualEye(object):
         # ****************************************
         # Load Parameters
         # ****************************************
-        image_topic = rospy.get_param('image_topic')
+        self.image_topic = rospy.get_param('image_topic')
+        self.image_saver = rospy.get_param('image_saver')
 
         # ****************************************
         # Subscriber
         # ****************************************
-        self.image_sub = rospy.Subscriber(image_topic, Image, self.callback, queue_size=1)
+        self.image_sub = rospy.Subscriber(self.image_topic, Image, self.callback, queue_size=1)
         
         # ****************************************
         # Create service client
@@ -51,7 +52,8 @@ class VisualEye(object):
         if imag != 0:
             # Save image
             rospy.loginfo(msg.header.stamp.secs)
-            self.client_camera()
+            if self.image_saver == 1:
+                self.client_camera()
             # Send to view cell
             self.goal.image = msg
             self.client.send_goal(self.goal)

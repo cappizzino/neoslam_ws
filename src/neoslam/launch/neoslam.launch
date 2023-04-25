@@ -1,5 +1,9 @@
 <launch>
-  <rosparam command="load" file="$(find neoslam)/config/hwu_husky.yaml" />
+
+  <rosparam command="load" file="$(find neoslam)/config/$(env SYS_CONFIG_NEOCORTEX)"/>
+  <rosparam subst_value="true">
+    image_saver: $(env SYS_IMAGE_ENABLED)
+  </rosparam>
 
   <node pkg="neocortex" name="neocortex_server" type="neocortex_server.py" output="screen">
   </node>

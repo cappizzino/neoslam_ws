@@ -65,7 +65,7 @@ input=(
 '
   'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
 '
-  'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver|| exit
+  'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver || exit
 '
   'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:=$SYS_IMAGE_TOPIC || exit
 '
@@ -133,8 +133,10 @@ LOG_DIR="$MAIN_DIR/$PROJECT_NAME/"
 SUFFIX=$(date +"%Y_%m_%d_%H_%M_%S")
 SUBLOG_DIR="$LOG_DIR/"$ITERATOR"_"$SUFFIX""
 TMUX_DIR="$SUBLOG_DIR/tmux"
+IMAGE_DIR="$SUBLOG_DIR/images"
 mkdir -p "$SUBLOG_DIR"
 mkdir -p "$TMUX_DIR"
+mkdir -p "$IMAGE_DIR"
 
 # link the "latest" folder to the recently created one
 rm "$LOG_DIR/latest" > /dev/null 2>&1

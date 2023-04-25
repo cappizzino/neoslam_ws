@@ -4,6 +4,9 @@ tempory_memory: "distal"
 # Preprocessing
 image_filter: "clahe" # gauss clahe none
 
+# Image saver
+image_saver: 1
+
 # Plot tests
 plot_test: "no" # no yes
 plot_test_cnn: "no"
