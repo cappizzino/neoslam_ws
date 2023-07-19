@@ -30,7 +30,7 @@ export SYS_ROSBAG_DURATION='8h'
 export SYS_ROSBAG_PATH="$HOME/bag_files/neoslam/latest/"
 
 # Experiment  
-export EXPERIMENT="robotarium" # corridor ; robotarium ; outdoor
+export EXPERIMENT="irataus" # corridor ; robotarium ; outdoor : irataus
 case $EXPERIMENT in
   corridor)
     export SYS_ROSBAG_NAME=_2022-04-07-11-08-05_corridor.bag
@@ -40,6 +40,9 @@ case $EXPERIMENT in
     ;;
   outdoor)
     export SYS_ROSBAG_NAME=_2022-04-07-11-19-55_outdoor_morning.bag
+    ;;
+  irataus)
+    export SYS_ROSBAG_NAME=irat_aus_28112011.bag
     ;;
 esac
 
@@ -53,13 +56,22 @@ export SYS_ROSBAG_ARGS="
     --duration=$SYS_ROSBAG_DURATION
     --output-prefix=$SYS_ROSBAG_PATH
 "
+# export SYS_ROSBAG_TOPICS="
+#     /odometry/filtered
+#     /husky(.*)
+#     /feats_cnn
+#     /feats_htm 
+#     /feats_lsbh 
+#     /info
+# "
 export SYS_ROSBAG_TOPICS="
-    /odometry/filtered
-    /husky(.*)
-    /feats_cnn
-    /feats_htm 
-    /feats_lsbh 
-    /info
+    /irat_red/ExperienceMap/Map 
+    /irat_red/ExperienceMap/RobotPose 
+    /irat_red/LocalView/Template 
+    /irat_red/PoseCell/TopologicalAction 
+    /overhead/pose
 "
+
 # ROS specific configs
+export ROSCONSOLE_CONFIG_FILE=$HOME/neoslam_ws/rosconsole.conf
 export ROSCONSOLE_FORMAT='[${severity}] [${node}] [${function}] [${line}]: ${message}'

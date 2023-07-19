@@ -11,15 +11,22 @@ From: osrf/ros:melodic-desktop-full
 # NOTE: Should be used to setup BUILD time environment variables.
 %post
     apt-get update
+
+    apt update
+
+    apt install -y \
+        libeigen3-dev \
+        libcanberra-gtk-module \
+        libcanberra-gtk3-module
     
-    apt-get install -y \
-        ros-$ROS_DISTRO-gazebo-ros-pkgs \
-        ros-$ROS_DISTRO-gazebo-ros-control \
-        ros-$ROS_DISTRO-husky-desktop \
-        ros-$ROS_DISTRO-husky-gazebo \
-        ros-$ROS_DISTRO-husky-simulator \
-        ros-$ROS_DISTRO-teleop-twist-keyboard \
-        dbus
+    # apt-get install -y \
+        # ros-$ROS_DISTRO-gazebo-ros-pkgs \
+        # ros-$ROS_DISTRO-gazebo-ros-control \
+        # ros-$ROS_DISTRO-husky-desktop \
+        #ros-$ROS_DISTRO-husky-gazebo \
+        # ros-$ROS_DISTRO-husky-simulator \
+        #ros-$ROS_DISTRO-teleop-twist-keyboard \
+        # dbus
 
     # other useful tools
     apt-get install -y \
@@ -35,14 +42,14 @@ From: osrf/ros:melodic-desktop-full
         git \
         lsb-release
     
-    pip install setuptools==25.2.0
-    pip install setuptools-scm==1.15.0rc1
-    pip install nupic
-    pip install torchvision==0.5.0 --no-cache-dir
-    pip install scipy==1.2.2
+    # pip install setuptools==25.2.0
+    # pip install setuptools-scm==1.15.0rc1
+    # pip install nupic
+    # pip install torchvision==0.5.0 --no-cache-dir
+    # pip install scipy==1.2.2
     pip install opencv-python==3.4.2.17
     pip install numpy==1.14.5
-    pip install future
+    # pip install future
 
     apt-get install -y \
         ros-$(rosversion -d)-cv-bridge \
