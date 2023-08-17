@@ -73,3 +73,6 @@ images/*.ini
 
 # Experiment folders
 /scripts/matlab/experiments/*
+
+# Dataset folders
+/ros_bags/*

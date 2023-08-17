@@ -1,5 +1,6 @@
 Bootstrap: docker
 From: osrf/ros:melodic-desktop-full
+# From: osrf/ros:melodic-ros-base
 
 # Container RUNTIME setup of environment.
 # NOTE: These variables are not made available during BUILD
@@ -16,53 +17,67 @@ From: osrf/ros:melodic-desktop-full
 
     apt install -y \
         libeigen3-dev \
-        libcanberra-gtk-module \
-        libcanberra-gtk3-module
+        libcanberra-gtk-module
     
     # apt-get install -y \
-        # ros-$ROS_DISTRO-gazebo-ros-pkgs \
-        # ros-$ROS_DISTRO-gazebo-ros-control \
-        # ros-$ROS_DISTRO-husky-desktop \
-        #ros-$ROS_DISTRO-husky-gazebo \
-        # ros-$ROS_DISTRO-husky-simulator \
-        #ros-$ROS_DISTRO-teleop-twist-keyboard \
-        # dbus
+    #    ros-$ROS_DISTRO-gazebo-ros-pkgs \
+    #    ros-$ROS_DISTRO-gazebo-ros-control \
+    #    ros-$ROS_DISTRO-husky-desktop \
+    #    ros-$ROS_DISTRO-husky-gazebo \
+    #    ros-$ROS_DISTRO-husky-simulator \
+    #    ros-$ROS_DISTRO-teleop-twist-keyboard \
+    #    dbus
 
     # other useful tools
     apt-get install -y \
-        python-pip \
-        make \
-        gcc \
-        python-catkin-tools \
-        vim \
-        nano \
-        zsh \
-        ranger \
-        tmux \
-        git \
-        lsb-release
+       python-pip \
+       make \
+       gcc \
+       python-catkin-tools \
+       vim \
+       nano \
+       zsh \
+       ranger \
+       tmux \
+       git \
+       lsb-release \
+       libirrlicht-dev \
+       libopencv-dev \
+       python-sklearn \
+       ros-melodic-cv-bridge \
+       python-tk
+    #    libopencv-core-dev
+    #    libopencv-dev \
+    #    ros-melodic-tf \
+    #    ros-melodic-image-transport \ 
+    #    ros-melodic-compressed-image-transport \
+    #    ros-melodic-topic-tools \ 
+    #    ros-melodic-rqt-plot \ 
+    #    ros-melodic-image-view \ 
+    #    ros-melodic-rqt* \ 
+    #    python-pyqt5
     
-    # pip install setuptools==25.2.0
-    # pip install setuptools-scm==1.15.0rc1
-    # pip install nupic
-    # pip install torchvision==0.5.0 --no-cache-dir
-    # pip install scipy==1.2.2
+    pip install setuptools==25.2.0
+    pip install setuptools-scm==1.15.0rc1
+    pip install nupic
+    pip install torchvision==0.5.0 --no-cache-dir
+    pip install scipy==1.2.2
     pip install opencv-python==3.4.2.17
     pip install numpy==1.14.5
-    # pip install future
+    pip install future
 
     apt-get install -y \
-        ros-$(rosversion -d)-cv-bridge \
-        python-rosdep \
-        ros-$(rosversion -d)-tf \
-        ros-$(rosversion -d)-compressed-image-transport \
-        libirrlicht-dev \
-        libopencv-dev \
-        libegl1-mesa-dev \
-        ros-$(rosversion -d)-image-view \
-        python-sklearn  \
-        ros-$(rosversion -d)-rqt ros-$(rosversion -d)-rqt-common-plugins \
-        python-tk
+    #    ros-$(rosversion -d)-cv-bridge \
+    #    python-rosdep \
+    #    ros-$(rosversion -d)-tf \
+    #    ros-$(rosversion -d)-compressed-image-transport \
+    #    libirrlicht-dev \
+    #    libopencv-dev \
+    #    libegl1-mesa-dev \
+    #    ros-$(rosversion -d)-image-view \
+    #    python-sklearn  \
+    #    ros-$(rosversion -d)-rqt ros-$(rosversion -d)-rqt-common-plugins \
+    #    python-tk
 
     SIM_LOCATION=/opt/neoslam
 

@@ -10,14 +10,20 @@
 # Default-Stop:      0 1 6
 # Short-Description: start the server
 ### END INIT INFO
-if [ "$(id -u)" == "0" ]; then
-  exec sudo -u mrs "$0" "$@"
-fi
+# if [ "$(id -u)" == "0" ]; then
+#   exec sudo -u mrs "$0" "$@"
+# fi
 
 source $HOME/.bashrc
 
 # location of the running script
 DIR_PATH=$(cd $(dirname $0); pwd)
+ROS_BAG_PATH="$DIR_PATH/../../ros_bags"
+ROS_CONFIG_PATH="$DIR_PATH/../../ros_config"
+ROS_DATA_PATH="$DIR_PATH/../../ros_data"
+ROS_LAUNCH_PATH="$DIR_PATH/../../ros_launch"
+ROS_RVIZ_PATH="$DIR_PATH/../../ros_rviz"
+ROS_MAP_PATH="$DIR_PATH/../../maps"
 
 # check if workspace was built
 [[ -f $DIR_PATH/../../devel/setup.bash ]] ||
@@ -45,6 +51,12 @@ SESSION_IP=$(hostname -I | awk '{print $1}')
 # * do NOT put ; at the end
 pre_input="mkdir -p $MAIN_DIR/$PROJECT_NAME; \
 export DIR_PATH=$DIR_PATH; \
+export ROS_BAG_PATH=$ROS_BAG_PATH; \
+export ROS_CONFIG_PATH=$ROS_CONFIG_PATH; \
+export ROS_DATA_PATH=$ROS_DATA_PATH; \
+export ROS_LAUNCH_PATH=$ROS_LAUNCH_PATH; \
+export ROS_RVIZ_PATH=$ROS_RVIZ_PATH; \
+export ROS_MAP_PATH=$ROS_MAP_PATH; \
 source $DIR_PATH/config/system_hw.sh; \
 source $DIR_PATH/config/system_sw.sh; \
 source $DIR_PATH/../../singularity/mount/addons.sh; \
@@ -56,26 +68,54 @@ source $DIR_PATH/../../devel/setup.bash"
 # * "new line" after the command    => the command will be called after start
 # * NO "new line" after the command => the command will wait for user's <enter>
 input=(
-#   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-#           rosbag play --pause --clock $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /husky_hwu/odom /odometry/filtered 
-# '
-  'PlayDataset' 'waitForRos; rosbag play --pause $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME
+  'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
+          rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /husky_hwu/odom /odometry/filtered 
 '
-#   'NeoSlam' 'waitForRos; roslaunch neoslam neoslam.launch
-# '
-#   'RatSlam' 'waitForRos; roslaunch neoslam ratslam.launch
-# '
+  'NeoSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam.launch
+'
+  'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam.launch
+'
   'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
 '
-#   'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver || exit
-# '
-#   'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:=$SYS_IMAGE_TOPIC || exit
-# '
-  'RatSlam' 'waitForRos; roslaunch ratslam_ros irataus.launch
+  'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver || exit
+'
+  'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:="$SYS_IMAGE_TOPIC" || exit
 '
   'roscore' 'checkRos || roscore && exit
 '
 )
+
+# input=(
+#   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
+#           rosbag play --pause --clock $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /husky_hwu/odom /odometry/filtered 
+# '
+# #   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
+# #           rosbag play --pause --clock $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME
+# # '
+# #   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
+# #           rosbag play --pause --clock $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME
+# # '
+# #   'PlayDataset' 'waitForRos; rosbag play --pause $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME
+# # '
+# #   'Republish' 'waitForRos; [ $SYS_IMAGE_TOPIC_REPUBLISED_ENABLED -eq 1 ] && rosrun image_transport republish compressed in:=/irat_red/camera/image raw out:=/irat/$SYS_IMAGE_TOPIC_REPUBLISED || exit
+# # '
+# #   'NeoSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam.launch
+# # '
+#   'NeoSlam' 'waitForRos; roslaunch neoslam neoslam.launch
+# '
+#   'RatSlam' 'waitForRos; roslaunch neoslam ratslam.launch
+# '
+#   'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
+# '
+#   'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver || exit
+# '
+#   'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:=$SYS_IMAGE_TOPIC || exit
+# '
+# #   'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/irataus.launch
+# # '
+#   'roscore' 'checkRos || roscore && exit
+# '
+# )
 
 # the name of the window to focus after start
 init_window="PlayDataset"

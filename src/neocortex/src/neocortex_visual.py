@@ -36,6 +36,7 @@ class VisualEye(object):
         # ****************************************
         # Create action client
         # ****************************************
+        self.goal = NeocortexViewCellGoal()
         self.client = actionlib.SimpleActionClient('neocortex_s', NeocortexViewCellAction)
         rospy.loginfo("Waiting for Neocortex server...")
         wait_neocortex = self.client.wait_for_server()
@@ -43,12 +44,15 @@ class VisualEye(object):
             rospy.logerr("Neocortex Server not available!")
             return
         rospy.loginfo("Connected to Neocortex server")
-        self.goal = NeocortexViewCellGoal()
 
         rospy.spin()
 
     def callback(self, msg):
-        imag = msg.header.stamp.secs - self.imag0
+        if self.imag0 == 0:
+            self.imag0 = msg.header.stamp.secs
+            return
+        else:
+            imag = msg.header.stamp.secs - self.imag0
         if imag != 0:
             # Save image
             rospy.loginfo(msg.header.stamp.secs)

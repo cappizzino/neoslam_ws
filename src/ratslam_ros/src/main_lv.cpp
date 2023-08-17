@@ -31,6 +31,9 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <sensor_msgs/image_encodings.h>
 
 #include "utils/utils.h"
 
@@ -46,11 +49,11 @@ using namespace std;
 
 #include "ratslam/local_view_match.h"
 
-#if HAVE_IRRLICHT
+// #if HAVE_IRRLICHT
 #include "graphics/local_view_scene.h"
 ratslam::LocalViewScene *lvs = NULL;
 bool use_graphics;
-#endif
+// #endif
 
 
 using namespace ratslam;
@@ -62,7 +65,22 @@ void image_callback(sensor_msgs::ImageConstPtr image, ros::Publisher * pub_vt)
 
   static ratslam_ros::ViewTemplate vt_output;
 
-  lv->on_image(&image->data[0], (image->encoding == "bgr8" ? false : true), image->width, image->height);
+  cv_bridge::CvImagePtr cv_ptr;
+  sensor_msgs::ImageConstPtr imageMsg;
+
+  try
+    {
+      cv_ptr = cv_bridge::toCvCopy(image, sensor_msgs::image_encodings::BGR8);
+    }
+    catch (cv_bridge::Exception& e)
+    {
+      ROS_ERROR("cv_bridge exception: %s", e.what());
+      return;
+    }
+
+  imageMsg = cv_ptr->toImageMsg();
+
+  lv->on_image(&imageMsg->data[0], (imageMsg->encoding == "bgr8" ? false : true), imageMsg->width, imageMsg->height);
 
   vt_output.header.stamp = ros::Time::now();
   vt_output.header.seq++;
@@ -71,12 +89,12 @@ void image_callback(sensor_msgs::ImageConstPtr image, ros::Publisher * pub_vt)
 
   pub_vt->publish(vt_output);
 
-#ifdef HAVE_IRRLICHT
+//#ifdef HAVE_IRRLICHT
   if (use_graphics)
   {
     lvs->draw_all();
   }
-#endif
+//#endif
 }
 
 int main(int argc, char * argv[])
@@ -110,15 +128,16 @@ int main(int argc, char * argv[])
 
   image_transport::ImageTransport it(node);
   image_transport::Subscriber sub = it.subscribe(topic_root + "/camera/image", 0, boost::bind(image_callback, _1, &pub_vt));
+  //image_transport::Subscriber sub = it.subscribe(topic_root + "/camera/image", 1, &image_callback);
 
 
-#ifdef HAVE_IRRLICHT
+// #ifdef HAVE_IRRLICHT
     boost::property_tree::ptree draw_settings;
     get_setting_child(draw_settings, settings, "draw", true);
     get_setting_from_ptree(use_graphics, draw_settings, "enable", true);
     if (use_graphics)
       lvs = new ratslam::LocalViewScene(draw_settings, lv);
-#endif
+// #endif
 
   ros::spin();
 

@@ -6,48 +6,59 @@
 # * use this file to source any additional configuration before launch (e.g. SERVER_IP)
 
 # Path CNN model
-export TORCH_HOME=$HOME/neoslam_ws/singularity/mount/model/checkpoints
+export TORCH_HOME=$ROS_DATA_PATH/model/checkpoints
 
 # Enable Dimension Reduction creation
 export DIMENSION_REDUCTION=0
-export MATRIX_HOME=$HOME/neoslam_ws/singularity/mount/data
-
-# Image Topic
-export SYS_IMAGE_TOPIC=/stereo_camera/left/image_raw
+export MATRIX_HOME=$ROS_DATA_PATH/matrix
 
 # Image Saver
-export SYS_IMAGE_ENABLED=1  # enable / disable image recording
+export SYS_IMAGE_ENABLED=0  # enable / disable image recording
 export SYS_IMAGE_ARGS=_save_all_image:=false
 export SYS_IMAGE_PATH=_filename_format:="$HOME/bag_files/neoslam/latest/images/image%04d.%s"
+
+# Image republished
+export SYS_IMAGE_TOPIC_REPUBLISED_ENABLED=1
+export SYS_IMAGE_TOPIC_REPUBLISED=/camera/image
 
 # Image Viewer
 export SYS_RQT_VIEWER_ENABLED=1
 
 # ROS bag
-export SYS_ROSBAG_ENABLED=1     # enable / disable bag recording (be careful to NOT run long term experiments without bags!)
+export SYS_ROSBAG_ENABLED=0     # enable / disable bag recording (be careful to NOT run long term experiments without bags!)
 export SYS_ROSBAG_SIZE='1024'   # max size before splitting in Mb (i.e. 0 = infinite, 1024 = 1024Mb = 1Gb)
 export SYS_ROSBAG_DURATION='8h'
 export SYS_ROSBAG_PATH="$HOME/bag_files/neoslam/latest/"
 
 # Experiment  
-export EXPERIMENT="irataus" # corridor ; robotarium ; outdoor : irataus
+export EXPERIMENT="robotarium" # corridor ; robotarium ; outdoor : irataus
 case $EXPERIMENT in
   corridor)
+    # Bag file name
     export SYS_ROSBAG_NAME=_2022-04-07-11-08-05_corridor.bag
+    # Image Topic
+    export SYS_IMAGE_TOPIC=/stereo_camera/left/image_raw
     ;;
   robotarium)
+    # Bag file name
     export SYS_ROSBAG_NAME=_2022-04-07-14-14-35_robotarium.bag
+    # Image Topic
+    export SYS_IMAGE_TOPIC=/stereo_camera/left/image_raw
     ;;
   outdoor)
+    # Bag file name
     export SYS_ROSBAG_NAME=_2022-04-07-11-19-55_outdoor_morning.bag
+    # Image Topic
+    export SYS_IMAGE_TOPIC=/stereo_camera/left/image_raw
     ;;
   irataus)
     export SYS_ROSBAG_NAME=irat_aus_28112011.bag
     ;;
 esac
 
-export SYS_CONFIG_RATSLAM="config_husky_hwu_$EXPERIMENT.txt.in"
-export SYS_CONFIG_NEOCORTEX="husky_hwu_$EXPERIMENT.yaml"
+# Configuration files
+export SYS_CONFIG_RATSLAM="ratslam_$EXPERIMENT.txt"
+export SYS_CONFIG_NEOCORTEX="neocortex_$EXPERIMENT.yaml"
 
 export SYS_ROSBAG_ARGS="
     --regex
