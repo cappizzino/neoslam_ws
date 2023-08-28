@@ -1,10 +1,13 @@
 #!/usr/bin/env python
+from numpy import append
 import rospy
 from termios import VSTART
 import numpy as np
 # Sklearn
 from sklearn.metrics.pairwise import cosine_similarity
 from utils.pairwiseDescriptor import pairwiseDescriptors
+# Scipy
+from scipy import sparse
 
 VT_START = rospy.get_param('VT_START')
 VT_ACTIVE_DECAY = rospy.get_param('VT_ACTIVE_DECAY')
@@ -40,6 +43,14 @@ class ViewCells(object):
         self.vt_relative_rad = 0
         self.map = []
         self.scores = 0
+
+        self.n_interval = 0
+        self.prev_interval = 0
+        self.intervals_htm_map = []
+        self.prev_intervals_htm_map = []
+        self.interval = {}
+        self.list_interval = []
+        self.interval_cell = []
 
     def _create_template(self, feature):
         return feature
@@ -107,9 +118,123 @@ class ViewCells(object):
         #self.id_cell = cell.id
         return cell
 
-    def on_image_map(self, feature, bin, n_image):
-        template = self._create_template(feature)
-        scores = self._score(template, self.map, bin)
+    def on_image_map(self, featureInt, bin, n_image):
+        feature = featureInt.astype(dtype=np.bool)
+        theta_alpha = 384 #0.75
+        theta_rho = 3
+        
+        # ****************************************
+        # Create Intervals
+        # ****************************************
+        if (n_image == 0):
+            self.interval = {
+                "InitEnd": [n_image,n_image],
+                #"anchor": feature,
+                #"descriptors": feature,
+                "global": feature
+            }
+            self.list_interval.append(self.interval)
+            #self.intervals_htm_map = feature
+        else:
+            # ****************************************
+            # Intervals: alpha
+            # ****************************************
+            if bin == 1:
+                anchor = self.list_interval[self.n_interval]["global"]
+                S = (anchor.astype(dtype=np.int)).dot((feature.astype(dtype=np.int)).transpose())
+                S = S.toarray()
+                #S = pairwiseDescriptors(anchor, feature)
+                #S = np.array(S)
+                alpha = S[0][0]
+            
+            # ****************************************
+            # Intervals: Distance
+            # ****************************************
+            o_distance = self.list_interval[self.n_interval]["InitEnd"][1] - \
+                self.list_interval[self.n_interval]["InitEnd"][0]
+
+            # ****************************************
+            # Intervals: create?
+            # ****************************************
+            if (alpha >= theta_alpha) and (o_distance < theta_rho):
+                self.list_interval[self.n_interval]["InitEnd"][1] = \
+                    self.list_interval[self.n_interval]["InitEnd"][1] + 1
+                self.list_interval[self.n_interval]["global"] = \
+                    self.list_interval[self.n_interval]["global"] + \
+                        feature
+            else:
+                self.interval = {
+                    "InitEnd": [n_image, n_image],
+                    #"anchor": feature,
+                    #"descriptors": feature,
+                    "global": feature
+                }
+                self.list_interval.append(self.interval)
+                self.n_interval = self.n_interval + 1
+
+        # ****************************************
+        # Map HTM - Intervals
+        # ****************************************
+        if self.n_interval == 0:
+            self.intervals_htm_map = featureInt
+        else:
+            if (self.prev_interval == self.n_interval):
+                self.intervals_htm_map = sparse.vstack([self.prev_intervals_htm_map,\
+                    self.list_interval[self.n_interval]["global"]])
+            else:
+                self.prev_intervals_htm_map = self.intervals_htm_map
+                self.intervals_htm_map = sparse.vstack([self.prev_intervals_htm_map,\
+                    self.list_interval[self.n_interval]["global"]])
+        
+        rospy.loginfo("Interval (%d): %s", self.n_interval,\
+             self.list_interval[self.n_interval]["InitEnd"])
+
+        # ****************************************
+        # Loop Closure
+        # ****************************************
+        values = (self.intervals_htm_map.astype(dtype=np.int)).dot \
+            (featureInt.transpose())
+        values_array = values.toarray()
+        #print(values_array[:,0])
+        
+        scores_compare_intervals = values_array[:-3,0]
+        #print(scores_compare_intervals)
+
+        if (n_image == 0):
+            cell = self.create_cell(0, n_image, 0, 0, 0)
+            self.interval_cell.append(cell.id)
+        else: 
+            match = np.nonzero(scores_compare_intervals > 470) # 480
+            #print(match)
+            if (not np.any(match)):
+                if (self.prev_interval != self.n_interval):
+                    cell = self.create_cell(0, n_image, 0, 0, 0)
+                else:
+                    cell = self.prev_cell
+            else:
+                rospy.loginfo("Loop Closure")
+                i = np.argmax(scores_compare_intervals)
+                #print(i)
+                j = self.interval_cell[i]
+                cell = self.cells[j]
+                cell.first = False
+
+        if (self.prev_interval != self.n_interval):
+            self.interval_cell.append(cell.id)
+        #print(self.interval_cell)
+
+        if (self.n_interval == 0):
+            self.interval_map = values_array
+        else:
+            if (self.prev_interval != self.n_interval):
+                self.interval_map = np.pad(self.interval_map, (0, 1), 'constant')
+            self.interval_map[:,self.n_interval] = values_array[:,0]
+        #print(self.interval_map)
+
+        self.prev_cell = cell
+        self.prev_interval = self.n_interval
+       
+        return self.interval_map, cell
 
     def get_current_vt(self):
         return self.id_cell

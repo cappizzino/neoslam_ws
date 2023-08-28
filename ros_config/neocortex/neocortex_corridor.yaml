@@ -12,8 +12,8 @@ plot_test: "no" # no yes
 plot_test_cnn: "no"
 
 # topics
-image_topic: "/stereo_camera/left/image_raw"
-topic_local_view: '/husky_hwu/LocalView/Template'
+image_topic: "/image_raw"
+topic_local_view: '/LocalView/Template'
 bag_topic_02: "/odometry/filtered"
 
 # Cortical Grid Cells

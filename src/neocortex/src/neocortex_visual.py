@@ -55,7 +55,7 @@ class VisualEye(object):
             imag = msg.header.stamp.secs - self.imag0
         if imag != 0:
             # Save image
-            rospy.loginfo(msg.header.stamp.secs)
+            rospy.loginfo("Timestamp: %d",msg.header.stamp.secs)
             if self.image_saver == 1:
                 self.client_camera()
             # Send to view cell

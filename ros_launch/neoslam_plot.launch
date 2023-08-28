@@ -1,0 +1,9 @@
+<launch>
+
+  <!-- <remap from="/stereo_camera/left/image_raw" to="/husky_hwu/camera/image"/> -->
+  <!-- <remap from="/odometry/filtered" to="/husky_hwu/odometry/filtered"/> -->
+
+  <!--- NeoSLAM plots -->
+  <node pkg="neoslam" name="neoslam_plots" type="neoslam_plots.py"  output="screen" cwd="node"></node>
+
+</launch>

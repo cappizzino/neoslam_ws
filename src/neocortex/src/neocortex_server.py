@@ -1,14 +1,17 @@
 #! /usr/bin/env python
 from __future__ import division
+from re import X
 import rospy
 import time
 import actionlib
 from neocortex.msg import NeocortexViewCellAction, NeocortexViewCellFeedback, NeocortexViewCellResult
 from std_msgs.msg import ByteMultiArray as BIN
 from std_msgs.msg import Float32MultiArray as FLOAT
+from std_msgs.msg import UInt16MultiArray as UINT
 from neocortex.msg import ViewTemplate, infoExp
 from viewcell.view_cell import ViewCells
 from gridcell.grid_cell import GridCells
+from utils.pairwiseDescriptor import pairwiseDescriptors
 # Numpy
 import numpy as np
 # Image
@@ -146,10 +149,17 @@ class ActionServer():
         # ****************************************
         # Variables
         # ****************************************
-        self.feats_cnn  = FLOAT()
+        self.feats_cnn = FLOAT()
         self.feats_lsbh = BIN()
         self.feats_htm = BIN()
         self.feats_htm_map = []
+        # Intervals
+        self.intervals_htm_map = []
+        self.prev_intervals_htm_map = []
+        self.prev_interval = 0
+        self.interval_map = np.array([[0]])
+        self.interval_scores = UINT()
+        # View Cells
         self.vt_output = ViewTemplate()
         self.lv = ViewCells()
         self.info_exp = infoExp()
@@ -169,6 +179,7 @@ class ActionServer():
         self.features_cnn = rospy.Publisher('/feats_cnn', FLOAT, queue_size=1)
         self.features_lsbh = rospy.Publisher('/feats_lsbh', BIN, queue_size=1)
         self.features_htm = rospy.Publisher('/feats_htm', BIN, queue_size=1)
+        self.pub_int_scores = rospy.Publisher('/int_scores', UINT, queue_size=1)
         self.info = rospy.Publisher('/info', infoExp, queue_size=1)
 
     def execute_cb(self, goal):
@@ -304,9 +315,52 @@ class ActionServer():
         # ****************************************
         # Visual Template
         # ****************************************
-        cell_vc = self.lv.on_image(feature=d1_htm_sparse, map=self.feats_htm_map, bin=1, n_image=self.count-1, gc = self.gc)
-        rospy.loginfo("View Cell ID: %d, Image: %s", cell_vc.id, cell_vc.imgs)
-        rospy.loginfo("Image: %d, View Cell ID: %d", self.count-1, cell_vc.id)
+        #cell_vc = self.lv.on_image(feature=d1_htm_sparse, map=self.feats_htm_map, bin=1, n_image=self.count-1, gc = self.gc)
+        #rospy.loginfo("View Cell ID: %d, Image: %s", cell_vc.id, cell_vc.imgs)
+        #rospy.loginfo("Image: %d, View Cell ID: %d", self.count-1, cell_vc.id)
+
+        # ****************************************
+        # Intervals
+        # ****************************************
+        self.interval_map, cell_vc = self.lv.on_image_map \
+            (featureInt=d1_htm_sparse, bin=1, n_image=self.count-1)
+        # test_interval, interval = self.lv.on_image_map \
+        #     (featureInt=d1_htm_sparse, bin=1, n_image=self.count-1)
+
+        # # ****************************************
+        # # Map HTM - Intervals
+        # # ****************************************
+        # if interval == 0:
+        #     self.intervals_htm_map = d1_htm_sparse
+        # else:
+        #     if (self.prev_interval == interval):
+        #         self.intervals_htm_map = sparse.vstack([self.prev_intervals_htm_map,\
+        #             test_interval[interval]["global"]])
+        #     else:
+        #         self.prev_intervals_htm_map = self.intervals_htm_map
+        #         self.intervals_htm_map = sparse.vstack([self.prev_intervals_htm_map,\
+        #             test_interval[interval]["global"]])
+
+        # rospy.loginfo("Interval (%d): %s", interval, test_interval[interval]["InitEnd"])
+        
+        # values = (self.intervals_htm_map.astype(dtype=np.int)).dot \
+        #     (d1_htm_sparse.transpose())
+        # values_array = values.toarray()
+        # #print(values_array[:,0])
+
+        # if (interval == 0):
+        #     self.interval_map = values_array
+        # else:
+        #     if (self.prev_interval != interval):
+        #         self.interval_map = np.pad(self.interval_map, (0, 1), 'constant')
+        #     self.interval_map[:,interval] = values_array[:,0]
+        # #print(self.interval_map)
+
+        self.interval_scores.data = np.reshape(self.interval_map, -1)
+        self.interval_scores.data = self.interval_scores.data# > 480
+        self.publish_interval_scores(self.interval_scores) 
+
+        # self.prev_interval = interval
 
         # ****************************************
         # Time elapsed
@@ -315,7 +369,7 @@ class ActionServer():
         time_exec = end - start
 
         # ****************************************
-        # Send message
+        # Send View Cell message
         # ****************************************
         self.vt_output.header.stamp = rospy.Time.now()
         self.vt_output.header.seq += 1
@@ -346,7 +400,7 @@ class ActionServer():
         if success:
             self.a_server.set_succeeded(result)
 
-        rospy.loginfo(time_exec)
+        rospy.loginfo("Time elapsed: %0.3fs", time_exec)
 
         rate.sleep()
 
@@ -365,6 +419,10 @@ class ActionServer():
     def publish_vt(self, data):
         'Publish View Template'
         self.pub_vt.publish(data)
+
+    def publish_interval_scores(self, data):
+        'Publish Interval Scores'
+        self.pub_int_scores.publish(data)
 
     def publish_info(self, data):
         'Publish Information'

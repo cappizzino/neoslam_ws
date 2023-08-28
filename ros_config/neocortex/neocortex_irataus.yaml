@@ -2,7 +2,7 @@
 tempory_memory: "distal"
 
 # Preprocessing
-image_filter: "none" # gauss clahe none
+image_filter: "clahe" # gauss clahe none
 
 # Image saver
 image_saver: 1
@@ -23,7 +23,7 @@ POSECELL_VTRANS_SCALING: 1./5.
 ODO_ROT_SCALING: 1.0
 
 # Visual Cells
-VT_START: 20 # 15
-VT_MATCH_THRESHOLD: 0.7 # 0.75
+VT_START: 10
+VT_MATCH_THRESHOLD: 0.8 # 0.75
 VT_GLOBAL_DECAY: 0.1
 VT_ACTIVE_DECAY: 1.0

@@ -1,0 +1,15 @@
+
+<launch>
+
+	<machine name="local_alt" address="localhost" default="true" />
+
+	<arg name="ros_config_path" default="$(optenv ROS_CONFIG_PATH)"/>
+
+	<node name="RatSLAMLocalViewCells" pkg="ratslam_ros" type="ratslam_lv" args="$(arg ros_config_path)/ratslam/ratslam_irataus.txt _image_transport:=compressed" output="screen" cwd="node" required="true" />
+	<node name="RatSLAMPoseCells" pkg="ratslam_ros" type="ratslam_pc" args="$(arg ros_config_path)/ratslam/ratslam_irataus.txt _image_transport:=compressed" output="screen" cwd="node" required="true" />
+	<node name="RatSLAMExperienceMap" pkg="ratslam_ros" type="ratslam_em" args="$(arg ros_config_path)/ratslam/ratslam_irataus.txt _image_transport:=compressed" output="screen" cwd="node" required="true" />
+
+	<node pkg="image_view" type="image_view" name="overhead" args="image:=/overhead/camera/image _image_transport:=compressed" />
+
+</launch>
+ 
