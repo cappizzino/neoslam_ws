@@ -54,7 +54,7 @@ source $DIR_PATH/../../devel/setup.bash"
 # * "new line" after the command    => the command will be called after start
 # * NO "new line" after the command => the command will wait for user's <enter>
 export SLAM_MODEL="neoslam" # ratslam ; neoslam
-export DATASET="outdoor" # corridor ; robotarium ; outdoor ; irataus
+export DATASET="irataus" # corridor ; robotarium ; outdoor ; irataus
 
 # Configuration files
 export SYS_CONFIG_RATSLAM="ratslam_$DATASET.txt"

@@ -9,9 +9,6 @@ from utils.pairwiseDescriptor import pairwiseDescriptors
 # Scipy
 from scipy import sparse
 
-VT_START = rospy.get_param('VT_START')
-VT_ACTIVE_DECAY = rospy.get_param('VT_ACTIVE_DECAY')
-VT_MATCH_THRESHOLD = rospy.get_param('VT_MATCH_THRESHOLD')
 
 class ViewCell(object):
     "A ViewCell object is used to store the information of a single view cell"
@@ -27,7 +24,7 @@ class ViewCell(object):
         self.y_gc = y_gc
         self.th_gc = th_gc
         self.first = True
-        self.decay = VT_ACTIVE_DECAY
+        self.vt_active_decay = rospy.get_param('vt_active_decay')
 
         ViewCell._ID += 1
 
@@ -52,6 +49,13 @@ class ViewCells(object):
         self.list_interval = []
         self.interval_cell = []
 
+        self.theta_alpha = rospy.get_param('theta_alpha', 384)
+        self.theta_rho = rospy.get_param('theta_rho', 3)
+        self.score_interval = rospy.get_param('score_interval', 470)
+        self.vt_start = rospy.get_param('vt_start', 0)
+        self.vt_match_threshold = rospy.get_param('vt_match_threshold', 0.75)
+        self.vt_active_decay = rospy.get_param('vt_active_decay', 0.1)
+
     def _create_template(self, feature):
         return feature
 
@@ -67,9 +71,9 @@ class ViewCells(object):
         #Compute the similarity of a given template with all view cells.
         #scores = []
         #for cell in self.cells:
-        #    cell.decay -= 0.1 #VT_GLOBAL_DECAY
-        #    if cell.decay < 0:
-        #        cell.decay = 0
+        #    cell.vt_active_decay -= 0.1 #VT_GLOBAL_DECAY
+        #    if cell.vt_active_decay < 0:
+        #        cell.vt_active_decay = 0
         #    s = self._compare_cells(template, cell.template, bin)
         #    scores.append(s)
         s = self._compare_cells(template, map, bin)
@@ -92,11 +96,11 @@ class ViewCells(object):
         template = self._create_template(feature)
         self.scores = self._score(template, map, bin)
 
-        if (n_image <= VT_START):
+        if (n_image <= self.vt_start):
             cell = self.create_cell(template, n_image, x_gc, y_gc, th_gc)
         else:
-            scores_compare = self.scores[0][:-VT_START]
-            match = np.nonzero(scores_compare > VT_MATCH_THRESHOLD)
+            scores_compare = self.scores[0][:-self.vt_start]
+            match = np.nonzero(scores_compare > self.vt_match_threshold)
             if (not np.any(match)):
                 cell = self.create_cell(template, n_image, x_gc, y_gc, th_gc)
             else:
@@ -107,7 +111,7 @@ class ViewCells(object):
                 cell = self.cells[j]
                 cell.imgs.append(n_image)
                 cell.first = False
-                #cell.decay += self.VT_ACTIVE_DECAY
+                #cell.vt_active_decay += self.vt_active_decay
         
         self.image_cell.append(cell.id)
 
@@ -120,8 +124,6 @@ class ViewCells(object):
 
     def on_image_map(self, featureInt, bin, n_image):
         feature = featureInt.astype(dtype=np.bool)
-        theta_alpha = 384 #0.75
-        theta_rho = 3
         
         # ****************************************
         # Create Intervals
@@ -156,7 +158,7 @@ class ViewCells(object):
             # ****************************************
             # Intervals: create?
             # ****************************************
-            if (alpha >= theta_alpha) and (o_distance < theta_rho):
+            if (alpha >= self.theta_alpha) and (o_distance < self.theta_rho):
                 self.list_interval[self.n_interval]["InitEnd"][1] = \
                     self.list_interval[self.n_interval]["InitEnd"][1] + 1
                 self.list_interval[self.n_interval]["global"] = \
@@ -204,7 +206,7 @@ class ViewCells(object):
             cell = self.create_cell(0, n_image, 0, 0, 0)
             self.interval_cell.append(cell.id)
         else: 
-            match = np.nonzero(scores_compare_intervals > 470) # 480
+            match = np.nonzero(scores_compare_intervals > self.score_interval) # 470 480
             #print(match)
             if (not np.any(match)):
                 if (self.prev_interval != self.n_interval):

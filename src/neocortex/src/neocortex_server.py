@@ -44,10 +44,16 @@ class ActionServer():
         # ****************************************
         self.tempory_memory = rospy.get_param('tempory_memory')
         self.image_filter = rospy.get_param('image_filter')
-        self.plot_test = rospy.get_param('plot_test')
-        self.plot_test_cnn = rospy.get_param('plot_test_cnn')
+        self.plot_image = rospy.get_param('plot_image', False)
+        self.plot_test = rospy.get_param('plot_test', False)
+        self.plot_test_cnn = rospy.get_param('plot_test_cnn', False)
         self.topic_local_view = rospy.get_param('topic_local_view')
-
+        self.interval_mode = rospy.get_param('interval_mode', True)
+        self.crop_image = rospy.get_param('crop_image', False)
+        self.crop_width_start = rospy.get_param('crop_width_start')
+        self.crop_width_end = rospy.get_param('crop_width_end')
+        self.crop_height_start = rospy.get_param('crop_height_start')
+        self.crop_height_end = rospy.get_param('crop_height_end')
 
         # ****************************************
         # Preprocessing
@@ -199,6 +205,10 @@ class ActionServer():
         # Preprocessing (filter)
         # ****************************************
         img_origin = self.bridge.imgmsg_to_cv2(goal.image, "bgr8")
+        if (self.crop_image == True):
+            crop_image = img_origin[self.crop_width_start:self.crop_width_end, \
+                self.crop_height_start:self.crop_height_end]
+            img_origin = crop_image
 
         if self.image_filter == 'gauss':
             imga = cv2.cvtColor(img_origin, cv2.COLOR_BGR2RGB)
@@ -212,7 +222,12 @@ class ActionServer():
         else:
             imga = cv2.cvtColor(img_origin, cv2.COLOR_BGR2RGB)
 
-        if self.plot_test == 'yes':
+        if self.plot_image == True:
+            fig0, ax0 = plt.subplots(1, 1, sharey=True)
+            ax0.imshow(imga)
+            plt.show()
+
+        if self.plot_test == True:
             fig1, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
             img_origin_rgb = cv2.cvtColor(img_origin, cv2.COLOR_BGR2RGB)
             ax1.imshow(img_origin_rgb)
@@ -245,7 +260,7 @@ class ActionServer():
         with torch.no_grad():
             output = self.model(input_batch)
 
-        if self.plot_test_cnn == 'yes':
+        if self.plot_test_cnn == True:
             fig2, axs = plt.subplots(1, 3)
             for i in range(0,3):
                 axs[i].imshow(output[0,i,:,:])
@@ -312,20 +327,21 @@ class ActionServer():
         else:
             self.feats_htm_map = sparse.vstack([self.feats_htm_map, d1_htm_sparse])
 
-        # ****************************************
-        # Visual Template
-        # ****************************************
-        #cell_vc = self.lv.on_image(feature=d1_htm_sparse, map=self.feats_htm_map, bin=1, n_image=self.count-1, gc = self.gc)
-        #rospy.loginfo("View Cell ID: %d, Image: %s", cell_vc.id, cell_vc.imgs)
-        #rospy.loginfo("Image: %d, View Cell ID: %d", self.count-1, cell_vc.id)
-
-        # ****************************************
-        # Intervals
-        # ****************************************
-        self.interval_map, cell_vc = self.lv.on_image_map \
-            (featureInt=d1_htm_sparse, bin=1, n_image=self.count-1)
-        # test_interval, interval = self.lv.on_image_map \
-        #     (featureInt=d1_htm_sparse, bin=1, n_image=self.count-1)
+        if self.interval_mode == False:
+            # ****************************************
+            # Visual Template
+            # ****************************************
+            cell_vc = self.lv.on_image(feature=d1_htm_sparse, map=self.feats_htm_map, bin=1, n_image=self.count-1, gc = self.gc)
+            rospy.loginfo("View Cell ID: %d, Image: %s", cell_vc.id, cell_vc.imgs)
+            rospy.loginfo("Image: %d, View Cell ID: %d", self.count-1, cell_vc.id)
+        else:
+            # ****************************************
+            # Intervals
+            # ****************************************
+            self.interval_map, cell_vc = self.lv.on_image_map \
+                (featureInt=d1_htm_sparse, bin=1, n_image=self.count-1)
+            # test_interval, interval = self.lv.on_image_map \
+            #     (featureInt=d1_htm_sparse, bin=1, n_image=self.count-1)
 
         # # ****************************************
         # # Map HTM - Intervals
@@ -356,9 +372,9 @@ class ActionServer():
         #     self.interval_map[:,interval] = values_array[:,0]
         # #print(self.interval_map)
 
-        self.interval_scores.data = np.reshape(self.interval_map, -1)
-        self.interval_scores.data = self.interval_scores.data# > 480
-        self.publish_interval_scores(self.interval_scores) 
+            self.interval_scores.data = np.reshape(self.interval_map, -1)
+            self.interval_scores.data = self.interval_scores.data# > 480
+            self.publish_interval_scores(self.interval_scores) 
 
         # self.prev_interval = interval
 
