@@ -4,10 +4,10 @@ tempory_memory: "distal"
 # Preprocessing
 image_filter: "clahe" # gauss clahe none
 crop_image: False
-# crop_width_start: 25
-# crop_width_end: 150
-# crop_height_start: 0
-# crop_height_end: 416
+crop_width_start: 25
+crop_width_end: 150
+crop_height_start: 0
+crop_height_end: 416
 
 # Image saver
 image_saver: 0

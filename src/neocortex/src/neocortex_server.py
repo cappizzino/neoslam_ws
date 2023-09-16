@@ -50,10 +50,10 @@ class ActionServer():
         self.topic_local_view = rospy.get_param('topic_local_view')
         self.interval_mode = rospy.get_param('interval_mode', True)
         self.crop_image = rospy.get_param('crop_image', False)
-        self.crop_width_start = rospy.get_param('crop_width_start')
-        self.crop_width_end = rospy.get_param('crop_width_end')
-        self.crop_height_start = rospy.get_param('crop_height_start')
-        self.crop_height_end = rospy.get_param('crop_height_end')
+        self.crop_width_start = rospy.get_param('crop_width_start', 0)
+        self.crop_width_end = rospy.get_param('crop_width_end', 250)
+        self.crop_height_start = rospy.get_param('crop_height_start', 0)
+        self.crop_height_end = rospy.get_param('crop_height_end', 250)
 
         # ****************************************
         # Preprocessing
