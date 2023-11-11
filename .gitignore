@@ -61,6 +61,7 @@ CATKIN_IGNORE
 # jpg files
 images/*.jpg
 images/*.ini
+src/neoslam/src/*.png
 
 # BAG
 *.bag
