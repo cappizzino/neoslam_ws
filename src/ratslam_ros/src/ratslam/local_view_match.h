@@ -41,6 +41,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <chrono>
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -97,6 +98,11 @@ public:
     return vt_data;
   }
 
+  std::vector<double> get_elapsed_time()
+  {
+    return vt_elapsed_time;
+  }
+  
   template<typename Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
@@ -184,6 +190,7 @@ private:
   int prev_vt;
   double vt_relative_rad;
   std::vector<double> vt_data;
+  std::vector<double> vt_elapsed_time;
 
   const unsigned char *view_rgb;
   bool greyscale;

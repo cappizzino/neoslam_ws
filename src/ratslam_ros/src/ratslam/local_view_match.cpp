@@ -338,6 +338,8 @@ void LocalViewMatch::compare(double &vt_err, unsigned int &vt_match_id)
   cout << "Templates: " << templates.size() << endl;
   cout.flush();
 
+  auto begin = std::chrono::high_resolution_clock::now();
+
   if (VT_PANORAMIC)
   {
 
@@ -471,6 +473,10 @@ void LocalViewMatch::compare(double &vt_err, unsigned int &vt_match_id)
 	vt_error = vt_err;
 
   }
+	auto end = std::chrono::high_resolution_clock::now();
+	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+  vt_elapsed_time.push_back(elapsed.count() * 1e-6);
+	printf("Time measured: %.9f seconds.\n", elapsed.count() * 1e-9);
 }
 
 }
