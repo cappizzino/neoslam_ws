@@ -55,6 +55,7 @@ LocalViewMatch::LocalViewMatch(ptree settings)
   get_setting_from_ptree(VT_PANORAMIC, settings, "vt_panoramic", 0);
  
   get_setting_from_ptree(VT_MATCH_THRESHOLD, settings, "vt_match_threshold", 0.03);
+  get_setting_from_ptree(VT_THRESHOLD_CONDITION, settings, "vt_threshold_condition", true);
   get_setting_from_ptree(TEMPLATE_X_SIZE, settings, "template_x_size", 1);
   get_setting_from_ptree(TEMPLATE_Y_SIZE, settings, "template_y_size", 1);
   get_setting_from_ptree(IMAGE_VT_X_RANGE_MIN, settings, "image_crop_x_min", 0);
@@ -98,7 +99,7 @@ void LocalViewMatch::on_image(const unsigned char *view_rgb, bool greyscale, uns
   prev_vt = get_current_vt();
   unsigned int vt_match_id;
   compare(vt_error, vt_match_id);
-  if (vt_error <= VT_MATCH_THRESHOLD)
+  if ((vt_error <= VT_MATCH_THRESHOLD) && VT_THRESHOLD_CONDITION)
   {
     set_current_vt((int)vt_match_id);
     cout << "VTM[" << setw(4) << get_current_vt() << "] " << endl;
@@ -310,6 +311,9 @@ void LocalViewMatch::compare(double &vt_err, unsigned int &vt_match_id)
   double mindiff, cdiff;
   mindiff = DBL_MAX;
 
+  double diff;
+  int it_diff;
+
   vt_err = DBL_MAX;
   int min_template = 0;
 
@@ -327,6 +331,12 @@ void LocalViewMatch::compare(double &vt_err, unsigned int &vt_match_id)
 
   int offset;
   double epsilon = 0.005;
+
+  vt_data.clear();
+  vt_data.reserve(templates.size());
+  it_diff = 0;
+  cout << "Templates: " << templates.size() << endl;
+  cout.flush();
 
   if (VT_PANORAMIC)
   {
@@ -405,8 +415,12 @@ void LocalViewMatch::compare(double &vt_err, unsigned int &vt_match_id)
 	BOOST_FOREACH(vt, templates)
 	{
 
-	if (abs(current_mean - vt.mean) > VT_MATCH_THRESHOLD + epsilon)
-	  continue;
+  diff = 0;
+  it_diff++;
+
+	if (VT_THRESHOLD_CONDITION == true)
+		if (abs(current_mean - vt.mean) > VT_MATCH_THRESHOLD + epsilon)
+		continue;
 
 	// for each vt try matching the view at different offsets
 	// try to fast break based on error already great than previous errors
@@ -429,8 +443,9 @@ void LocalViewMatch::compare(double &vt_err, unsigned int &vt_match_id)
 		}
 
 		// fast breaks
-		if (cdiff > mindiff)
-		  break;
+		if (VT_THRESHOLD_CONDITION == true)
+			if (cdiff > mindiff)
+				break;
 	  }
 
 	  if (cdiff < mindiff)
@@ -441,11 +456,17 @@ void LocalViewMatch::compare(double &vt_err, unsigned int &vt_match_id)
 	  }
 	}
 
+  diff = cdiff;
+  vt_data.push_back(diff / (double) (TEMPLATE_SIZE - 2 * VT_SHIFT_MATCH * TEMPLATE_Y_SIZE));
+
 	}
 
 	vt_relative_rad = 0;
 	vt_err = mindiff / (double)(TEMPLATE_SIZE - 2 * VT_SHIFT_MATCH * TEMPLATE_Y_SIZE);
 	vt_match_id = min_template;
+
+  cout << "Iteration: " << it_diff << endl;
+  cout.flush();
 
 	vt_error = vt_err;
 

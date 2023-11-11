@@ -92,6 +92,11 @@ public:
     return vt_relative_rad;
   }
 
+  std::vector<double> get_data()
+  {
+    return vt_data;
+  }
+
   template<typename Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
@@ -154,6 +159,7 @@ private:
   int VT_STEP_MATCH;
 
   double VT_MATCH_THRESHOLD;
+  bool VT_THRESHOLD_CONDITION;
   int TEMPLATE_SIZE;
   int IMAGE_WIDTH;
   int IMAGE_HEIGHT;
@@ -177,6 +183,7 @@ private:
   double vt_error;
   int prev_vt;
   double vt_relative_rad;
+  std::vector<double> vt_data;
 
   const unsigned char *view_rgb;
   bool greyscale;

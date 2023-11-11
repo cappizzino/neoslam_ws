@@ -86,6 +86,7 @@ void image_callback(sensor_msgs::ImageConstPtr image, ros::Publisher * pub_vt)
   vt_output.header.seq++;
   vt_output.current_id = lv->get_current_vt();
   vt_output.relative_rad = lv->get_relative_rad();
+  vt_output.feature = lv->get_data();
 
   pub_vt->publish(vt_output);
 
