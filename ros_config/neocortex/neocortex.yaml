@@ -10,13 +10,13 @@ image_saver: False          # Set to environment variable in launch file
 # Via files
 sort_files: True
 frame_id: camera
-loop: 10
+loop: 50
 image_folder: "/home/ingeniarius/neoslam_ws/scripts/matlab/experiments/barnbot/images_test/"
 # ****************************************
 # Neocortex Server
 # ****************************************
-# Tempory Memory - value="apical / distal"
-tempory_memory: "distal"
+# CNN
+cnn_compare: True
 # Preprocessing
 image_filter: "none" # gauss clahe none
 # Crop image
@@ -25,6 +25,11 @@ crop_width_start: 0
 crop_width_end: 150
 crop_height_start: 0
 crop_height_end: 416
+# ****************************************
+# Neocortex HTM
+# ****************************************
+# Tempory Memory - value="apical / distal"
+tempory_memory: "distal"
 # ****************************************
 # Neocortex Server: Spatial View Cells
 # ****************************************

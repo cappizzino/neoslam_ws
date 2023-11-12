@@ -14,6 +14,7 @@ from gridcell.grid_cell import GridCells
 from utils.pairwiseDescriptor import pairwiseDescriptors
 # Numpy
 import numpy as np
+from numpy.linalg import norm
 # Image
 from cv_bridge import CvBridge
 # OpenCV
@@ -54,6 +55,7 @@ class ActionServer():
         self.crop_width_end = rospy.get_param('crop_width_end', 250)
         self.crop_height_start = rospy.get_param('crop_height_start', 0)
         self.crop_height_end = rospy.get_param('crop_height_end', 250)
+        self.cnn_compare = rospy.get_param('cnn_compare', False)
 
         # ****************************************
         # Preprocessing
@@ -277,99 +279,101 @@ class ActionServer():
         self.feats_cnn.data = features_vector[0]
         self.publish_cnn(self.feats_cnn)
 
-        # ****************************************
-        # sLSBH (binarized descriptors)
-        # ****************************************
-        d1_slsbh = get_lsbh(features_vector, self.matrix_p, 0.25)
-        non_zero_lsbh = np.nonzero(d1_slsbh[0])
-        non_zero_lsbh_list = non_zero_lsbh[0].tolist()
-        # Send sLSBH features
-        self.feats_lsbh.data = d1_slsbh[0]
-        self.publish_lsbh(self.feats_lsbh)
-
-        # ****************************************
-        # Lateral prediction from Grid Cells
-        # ****************************************
-        i_gc = self.grid_cells.cells.flatten('C')
-        i_gc_sorted = np.sort(i_gc)
-        i_gc_sdr = i_gc > i_gc_sorted[self.grid_cells.total_gcells - self.grid_cells.numbers_one - 1]
-
-        # ****************************************
-        # HTM
-        # ****************************************
-        activeColumnIndices = non_zero_lsbh_list
-
-        if self.tempory_memory == "apical":
-            self.tm_apical.compute(activeColumnIndices, i_gc_sdr, learn=True)
-            activeCells = self.tm_apical.getWinnerCells()
-        elif self.tempory_memory == "distal":
-            self.tm.compute(activeColumnIndices, learn=True)
-            activeCells = self.tm.getWinnerCells()
-
-        d1_htm_sparse = sparse.lil_matrix((1,(self.tm.columnDimensions[0]*self.tm.cellsPerColumn)), dtype=np.int)
-        d1_htm_sparse[0,activeCells] = 1
-        d1_htm = d1_htm_sparse.toarray()
-        # Send HTM features
-        self.feats_htm.data = d1_htm[0]
-        self.publish_htm(self.feats_htm)    
-
-        # Test with SDR
-        if self.count == 1:
-            self.Du = d1_htm[0]
-        else:
-            self.Du = self.Du + d1_htm[0]
-        
-        n_perc = ((np.count_nonzero(self.Du))/d1_htm.shape[1])*100
-        rospy.loginfo("Sparsity: %f", n_perc)
-
-        # ****************************************
-        # Map HTM
-        # ****************************************
-        if self.count == 1:
-            self.feats_htm_map = d1_htm_sparse
-        else:
-            self.feats_htm_map = sparse.vstack([self.feats_htm_map, d1_htm_sparse])
-
-        if self.interval_mode == False:
-            # ****************************************
-            # Visual Template
-            # ****************************************
-            cell_vc = self.lv.on_image(feature=d1_htm_sparse, map=self.feats_htm_map, bin=1, n_image=self.count-1, gc = self.gc)
-            rospy.loginfo("View Cell ID: %d, Image: %s", cell_vc.id, cell_vc.imgs)
-            rospy.loginfo("Image: %d, View Cell ID: %d", self.count-1, cell_vc.id)
+        if self.cnn_compare == True:
+            rospy.loginfo("CNN: %d", self.count)
+            if self.count == 1:
+                self.feats_cnn_map = np.asmatrix(self.feats_cnn.data)
+            else:
+                self.feats_cnn_map = np.concatenate((self.feats_cnn_map, \
+                np.asmatrix(self.feats_cnn.data)), axis=0)
+                cnn_cosine = np.dot(self.feats_cnn_map,self.feats_cnn.data)/(norm(self.feats_cnn_map, axis=1)*norm(self.feats_cnn.data))
+                # print("Cosine Similarity:\n", cnn_cosine)
         else:
             # ****************************************
-            # Intervals
+            # sLSBH (binarized descriptors)
             # ****************************************
-            self.interval_map, cell_vc = self.lv.on_image_map \
-                (featureInt=d1_htm_sparse, bin=1, n_image=self.count-1)
-            self.interval_scores.data = np.reshape(self.interval_map, -1)
-            self.interval_scores.data = self.interval_scores.data
-            self.publish_interval_scores(self.interval_scores) 
+            d1_slsbh = get_lsbh(features_vector, self.matrix_p, 0.25)
+            non_zero_lsbh = np.nonzero(d1_slsbh[0])
+            non_zero_lsbh_list = non_zero_lsbh[0].tolist()
+            # Send sLSBH features
+            self.feats_lsbh.data = d1_slsbh[0]
+            self.publish_lsbh(self.feats_lsbh)
 
-        # ****************************************
-        # Time elapsed
-        # ****************************************
-        end = time.time()
-        time_exec = end - start
+            # ****************************************
+            # Lateral prediction from Grid Cells
+            # ****************************************
+            i_gc = self.grid_cells.cells.flatten('C')
+            i_gc_sorted = np.sort(i_gc)
+            i_gc_sdr = i_gc > i_gc_sorted[self.grid_cells.total_gcells - self.grid_cells.numbers_one - 1]
 
-        # ****************************************
-        # Send View Cell message
-        # ****************************************
-        self.vt_output.header.stamp = rospy.Time.now()
-        self.vt_output.header.seq += 1
-        self.vt_output.current_id = cell_vc.id
-        self.vt_output.relative_rad = self.lv.get_relative_rad()
-        self.publish_vt(self.vt_output)
+            # ****************************************
+            # HTM
+            # ****************************************
+            activeColumnIndices = non_zero_lsbh_list
 
-        # ****************************************
-        # Send info
-        # ****************************************
-        self.info_exp.current_img = self.count-1
-        self.info_exp.current_vc = cell_vc.id
-        self.info_exp.current_view_cell = cell_vc.imgs
-        self.info_exp.time_exec = time_exec
-        self.publish_info(self.info_exp)
+            if self.tempory_memory == "apical":
+                self.tm_apical.compute(activeColumnIndices, i_gc_sdr, learn=True)
+                activeCells = self.tm_apical.getWinnerCells()
+            elif self.tempory_memory == "distal":
+                self.tm.compute(activeColumnIndices, learn=True)
+                activeCells = self.tm.getWinnerCells()
+
+            d1_htm_sparse = sparse.lil_matrix((1,(self.tm.columnDimensions[0]*self.tm.cellsPerColumn)), dtype=np.int)
+            d1_htm_sparse[0,activeCells] = 1
+            d1_htm = d1_htm_sparse.toarray()
+            # Send HTM features
+            self.feats_htm.data = d1_htm[0]
+            self.publish_htm(self.feats_htm)    
+
+            # Test with SDR
+            if self.count == 1:
+                self.Du = d1_htm[0]
+            else:
+                self.Du = self.Du + d1_htm[0]
+            
+            n_perc = ((np.count_nonzero(self.Du))/d1_htm.shape[1])*100
+            rospy.loginfo("Sparsity: %f", n_perc)
+
+            # ****************************************
+            # Map HTM
+            # ****************************************
+            if self.count == 1:
+                self.feats_htm_map = d1_htm_sparse
+            else:
+                self.feats_htm_map = sparse.vstack([self.feats_htm_map, d1_htm_sparse])
+
+            if self.interval_mode == False:
+                # ****************************************
+                # Visual Template
+                # ****************************************
+                cell_vc = self.lv.on_image(feature=d1_htm_sparse, map=self.feats_htm_map, bin=1, n_image=self.count-1, gc = self.gc)
+                rospy.loginfo("View Cell ID: %d, Image: %s", cell_vc.id, cell_vc.imgs)
+                rospy.loginfo("Image: %d, View Cell ID: %d", self.count-1, cell_vc.id)
+            else:
+                # ****************************************
+                # Intervals
+                # ****************************************
+                self.interval_map, cell_vc = self.lv.on_image_map \
+                    (featureInt=d1_htm_sparse, bin=1, n_image=self.count-1)
+                self.interval_scores.data = np.reshape(self.interval_map, -1)
+                self.interval_scores.data = self.interval_scores.data
+                self.publish_interval_scores(self.interval_scores) 
+
+            # ****************************************
+            # Send View Cell message
+            # ****************************************
+            self.vt_output.header.stamp = rospy.Time.now()
+            self.vt_output.header.seq += 1
+            self.vt_output.current_id = cell_vc.id
+            self.vt_output.relative_rad = self.lv.get_relative_rad()
+            self.publish_vt(self.vt_output)
+
+            # ****************************************
+            # Info
+            # ****************************************
+            self.info_exp.current_img = self.count-1
+            self.info_exp.current_vc = cell_vc.id
+            self.info_exp.current_view_cell = cell_vc.imgs
 
         # ****************************************
         # Feedback
@@ -385,6 +389,17 @@ class ActionServer():
         if success:
             self.a_server.set_succeeded(result)
 
+        # ****************************************
+        # Time elapsed
+        # ****************************************
+        end = time.time()
+        time_exec = end - start
+
+        # ****************************************
+        # Send info
+        # ****************************************
+        self.info_exp.time_exec = time_exec
+        self.publish_info(self.info_exp)
         rospy.loginfo("Time elapsed: %0.3fs", time_exec)
 
         rate.sleep()
