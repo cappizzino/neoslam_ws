@@ -96,6 +96,7 @@ class ViewCells(object):
         template = self._create_template(feature)
         self.scores = self._score(template, map, bin)
 
+        rospy.loginfo("n_image: %d vt start: %d", n_image, self.vt_start)
         if (n_image <= self.vt_start):
             cell = self.create_cell(template, n_image, x_gc, y_gc, th_gc)
         else:

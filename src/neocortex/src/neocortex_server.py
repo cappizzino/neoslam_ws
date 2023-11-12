@@ -42,8 +42,8 @@ class ActionServer():
         # ****************************************
         # Load Parameters
         # ****************************************
-        self.tempory_memory = rospy.get_param('tempory_memory')
-        self.image_filter = rospy.get_param('image_filter')
+        self.tempory_memory = rospy.get_param('tempory_memory', "distal")
+        self.image_filter = rospy.get_param('image_filter', "none")
         self.plot_image = rospy.get_param('plot_image', False)
         self.plot_test = rospy.get_param('plot_test', False)
         self.plot_test_cnn = rospy.get_param('plot_test_cnn', False)
@@ -141,7 +141,7 @@ class ActionServer():
             self.matrix_p = np.load(os.path.join(out_dir, 'randomMatrix.npy'))
 
         # ****************************************
-        # Load Grid Cells
+        # Load Grid Cells (WIP)
         # ****************************************
         self.grid_cells = GridCells()
         self.x_gc, self.y_gc, self.th_gc = self.grid_cells.active
@@ -172,13 +172,6 @@ class ActionServer():
         self.count = 0
 
         # ****************************************
-        # Load Server
-        # ****************************************
-        self.a_server = actionlib.SimpleActionServer(
-            "neocortex_s", NeocortexViewCellAction, execute_cb=self.execute_cb, auto_start=False)
-        self.a_server.start()
-
-        # ****************************************
         # Define Publishers
         # ****************************************
         self.pub_vt = rospy.Publisher(self.topic_local_view, ViewTemplate, queue_size=1)
@@ -187,6 +180,13 @@ class ActionServer():
         self.features_htm = rospy.Publisher('/feats_htm', BIN, queue_size=1)
         self.pub_int_scores = rospy.Publisher('/int_scores', UINT, queue_size=1)
         self.info = rospy.Publisher('/info', infoExp, queue_size=1)
+
+        # ****************************************
+        # Load Server
+        # ****************************************
+        self.a_server = actionlib.SimpleActionServer(
+            "neocortex_s", NeocortexViewCellAction, execute_cb=self.execute_cb, auto_start=False)
+        self.a_server.start()
 
     def execute_cb(self, goal):
         start = time.time()
@@ -201,6 +201,7 @@ class ActionServer():
             self.a_server.set_preempted()
             success = False
 
+        rospy.loginfo("n_image: %d", self.count)
         # ****************************************
         # Preprocessing (filter)
         # ****************************************
@@ -258,7 +259,9 @@ class ActionServer():
             input_batch = input_batch.to('cuda')
             self.model.to('cuda')
         with torch.no_grad():
-            output = self.model(input_batch)
+            output_ = self.model(input_batch)
+
+        output = output_.cpu()
 
         if self.plot_test_cnn == True:
             fig2, axs = plt.subplots(1, 3)
@@ -340,43 +343,9 @@ class ActionServer():
             # ****************************************
             self.interval_map, cell_vc = self.lv.on_image_map \
                 (featureInt=d1_htm_sparse, bin=1, n_image=self.count-1)
-            # test_interval, interval = self.lv.on_image_map \
-            #     (featureInt=d1_htm_sparse, bin=1, n_image=self.count-1)
-
-        # # ****************************************
-        # # Map HTM - Intervals
-        # # ****************************************
-        # if interval == 0:
-        #     self.intervals_htm_map = d1_htm_sparse
-        # else:
-        #     if (self.prev_interval == interval):
-        #         self.intervals_htm_map = sparse.vstack([self.prev_intervals_htm_map,\
-        #             test_interval[interval]["global"]])
-        #     else:
-        #         self.prev_intervals_htm_map = self.intervals_htm_map
-        #         self.intervals_htm_map = sparse.vstack([self.prev_intervals_htm_map,\
-        #             test_interval[interval]["global"]])
-
-        # rospy.loginfo("Interval (%d): %s", interval, test_interval[interval]["InitEnd"])
-        
-        # values = (self.intervals_htm_map.astype(dtype=np.int)).dot \
-        #     (d1_htm_sparse.transpose())
-        # values_array = values.toarray()
-        # #print(values_array[:,0])
-
-        # if (interval == 0):
-        #     self.interval_map = values_array
-        # else:
-        #     if (self.prev_interval != interval):
-        #         self.interval_map = np.pad(self.interval_map, (0, 1), 'constant')
-        #     self.interval_map[:,interval] = values_array[:,0]
-        # #print(self.interval_map)
-
             self.interval_scores.data = np.reshape(self.interval_map, -1)
-            self.interval_scores.data = self.interval_scores.data# > 480
+            self.interval_scores.data = self.interval_scores.data
             self.publish_interval_scores(self.interval_scores) 
-
-        # self.prev_interval = interval
 
         # ****************************************
         # Time elapsed
