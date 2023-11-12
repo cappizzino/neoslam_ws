@@ -1,29 +1,56 @@
+# ****************************************
+# Neocortex Visual
+# ****************************************
+# General
+image_files: True    # True: read images from folder, False: wait topic
+waiting_rate: 1.0
+image_topic: '/image_raw'   # Set to environment variable in launch file
+# Via topic
+image_saver: False          # Set to environment variable in launch file
+# Via files
+sort_files: True
+frame_id: camera
+loop: 10
+image_folder: "/home/ingeniarius/neoslam_ws/scripts/matlab/experiments/barnbot/images_test/"
+# ****************************************
+# Neocortex Server
+# ****************************************
 # Tempory Memory - value="apical / distal"
 tempory_memory: "distal"
-
 # Preprocessing
-image_filter: "clahe" # gauss clahe none
-
-# Image saver
-image_saver: 1
-
+image_filter: "none" # gauss clahe none
+# Crop image
+crop_image: False
+crop_width_start: 0
+crop_width_end: 150
+crop_height_start: 0
+crop_height_end: 416
+# ****************************************
+# Neocortex Server: Spatial View Cells
+# ****************************************
+# Local View Topic
+topic_local_view: '/LocalView/Template'
+# Interval mode
+interval_mode: False
+theta_alpha: 384
+theta_rho: 2 #3
+score_interval: 470
+# Visual Cells
+vt_start: 20
+vt_match_threshold: 0.7
+vt_active_decay: 1.0
+# ****************************************
+# Neocortex Server - Plot tests
+# ****************************************
 # Plot tests
-plot_test: "no" # no yes
-plot_test_cnn: "no"
-
-# topics
-image_topic: "/stereo_camera/left/image_raw"
-topic_local_view: '/husky_hwu/LocalView/Template'
-bag_topic_02: "/odometry/filtered"
-
+plot_image: False
+plot_test: False
+plot_test_cnn: False
+# ****************************************
+# Neocortex Server - Grid Cells (WIP)
+# ****************************************
 # Cortical Grid Cells
 PC_DIM_XY: 11
 PC_DIM_TH: 18
 POSECELL_VTRANS_SCALING: 1./5.
 ODO_ROT_SCALING: 1.0
-
-# Visual Cells
-VT_START: 2
-VT_MATCH_THRESHOLD: 0.75
-VT_GLOBAL_DECAY: 0.1
-VT_ACTIVE_DECAY: 1.0
