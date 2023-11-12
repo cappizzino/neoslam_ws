@@ -118,6 +118,7 @@ if [ -e /opt/ros/$ROS_DISTRO/setup.bash ]; then
   source /opt/ros/$ROS_DISTRO/setup.bash
 fi
 
+export ROS_WORKSPACE="$HOME/neoslam_ws"
 # source the user_workspace, if it exists
 [ -e ~/neoslam_ws/devel/setup.bash ] && source ~/neoslam_ws/devel/setup.bash
 
@@ -131,10 +132,11 @@ fi
 OS_INFO=$(cat /proc/version)
 if ! ([[ "$OS_INFO" == *"Ubuntu"* ]] && [[ "$OS_INFO" == *"20.04"* ]]); then
   export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-  source /usr/share/gazebo/setup.bash
+  # source /usr/share/gazebo/setup.bash
 fi
 
 # source the shell addons if exists
 if [ -e /opt/neoslam/host/addons.sh ]; then
   source /opt/neoslam/host/addons.sh
 fi
+source /home/ingeniarius/neoslam_ws/singularity/mount/addons.sh

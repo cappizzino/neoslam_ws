@@ -1,0 +1,8 @@
+# Publisher
+topic_name: "image_raw"
+publish_rate: 0.1
+sort_files: True
+frame_id: camera
+sleep: 0
+loop: 1
+image_folder: "/home/ingeniarius/neoslam_ws/scripts/matlab/experiments/barnbot/images_test/"

@@ -53,181 +53,18 @@ source $DIR_PATH/../../devel/setup.bash"
 # * DO NOT PUT SPACES IN THE NAMES
 # * "new line" after the command    => the command will be called after start
 # * NO "new line" after the command => the command will wait for user's <enter>
-export SLAM_MODEL="neoslam" # ratslam ; neoslam
+export SLAM_MODEL="ratslam" # ratslam ; neoslam
 export DATASET="robotarium" # corridor ; robotarium ; outdoor ; irataus
 
 # Configuration files
-export SYS_CONFIG_RATSLAM="ratslam_$DATASET.txt"
-export SYS_CONFIG_NEOCORTEX="neocortex_$DATASET.yaml"
+# export SYS_CONFIG_RATSLAM="ratslam_$DATASET.txt"
+# export SYS_CONFIG_NEOCORTEX="neocortex_$DATASET.yaml"
+export SYS_CONFIG_NEOCORTEX="neocortex.yaml"
 
-case $DATASET in
-irataus)
-# Bag file name
-export SYS_ROSBAG_NAME=irat_aus_28112011.bag
-# Roslaunch files
 input=(
-  'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-          rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME /irat_red/camera/image/compressed:=/camera/image/compressed /irat_red/odom:=/odom
-'
-  'Republish' 'waitForRos; [ $SYS_IMAGE_TOPIC_REPUBLISED_ENABLED -eq 1 ] && rosrun image_transport republish compressed in:=/camera/image raw out:=$SYS_IMAGE_TOPIC || exit
-'
-)
-;;
-robotarium)
-# Bag file name
-export SYS_ROSBAG_NAME=_2022-04-07-14-14-35_robotarium.bag
-# Roslaunch files
-input=(
-  'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-          rosbag play --pause --clock -u 415 $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered /stereo_camera/left/image_raw:=$SYS_IMAGE_TOPIC /odometry/filtered:=/odom
-'
-)
-;;
-corridor)
-# Bag file name
-export SYS_ROSBAG_NAME=_2022-04-07-11-08-05_corridor.bag
-# Roslaunch files
-input=(
-  'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-          rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered /stereo_camera/left/image_raw:=$SYS_IMAGE_TOPIC /odometry/filtered:=/odom
-'
-)
-;;
-outdoor)
-# Bag file name
-export SYS_ROSBAG_NAME=_2022-03-24-16-17-34_outdoor_afternoon.bag
-# Roslaunch files
-input=(
-  'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-          rosbag play --pause --clock -s 65 $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered /stereo_camera/left/image_raw:=$SYS_IMAGE_TOPIC /odometry/filtered:=/odom
-'
-)
-;;
-esac
-
-case $SLAM_MODEL in
-ratslam)
-input+=(
-  'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam_irataus.launch
-'
-)
-;;
-neoslam)
-input+=(
   'NeoSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam.launch
 '
-  'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam.launch
-'
-  'NeoSlamPlots' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam_plot.launch
-'
 )
-;;
-esac
-
-# case $SLAM_MODEL in
-#   # corridor)
-#   # input=(
-#   #   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-#   #           rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered 
-#   #   '
-#   #   'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam_robotarium.launch
-#   #   '
-#   #   'roscore' 'checkRos || roscore && exit
-#   #   '
-#   #   )
-#   #   ;;
-#   # robotarium)
-#   # input=(
-#   #   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-#   #           rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered 
-#   #   '
-#   #   'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam_robotarium.launch
-#   #   '
-#   #   'roscore' 'checkRos || roscore && exit
-#   #   '
-#   #   )
-#   #     ;;
-#   # robotarium_neo)
-#   # input=(
-#   #   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-#   #           rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered 
-#   #   '
-#   #   'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam_robotarium.launch
-#   #   '
-#   #   'roscore' 'checkRos || roscore && exit
-#   #   '
-#   #   )
-#   #     ;;
-#   #   outdoor)
-#   # input=(
-#   #   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-#   #           rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered 
-#   #   '
-#   #   'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam_robotarium.launch
-#   #   '
-#   #   'roscore' 'checkRos || roscore && exit
-#   #   '
-#   #   )
-#   #   ;;
-#   ratslam)
-#     input+=(
-#       'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam_irataus.launch
-#     '
-#       'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
-#     '
-#       'roscore' 'checkRos || roscore && exit
-#     '
-#     )
-#     ;;
-#   neoslam)
-#     input+=(
-#       'NeoSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam.launch
-#     '
-#     #   'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam.launch
-#     # '
-#     #   'NeoSlamPlots' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam_plot.launch
-#     # '
-#     #   'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
-#     # '
-#     #   'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver || exit
-#     # '
-#       'roscore' 'checkRos || roscore && exit
-#     '
-#     )
-#     ;;
-# esac
-
-# input=(
-# #   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-# #           rosbag play --pause --clock $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /husky_hwu/odom /odometry/filtered 
-# # '
-# #   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-# #           rosbag play --pause --clock $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME
-# # '
-#   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-#           rosbag play --pause --clock $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME
-# '
-# #   'PlayDataset' 'waitForRos; rosbag play --pause $DIR_PATH/../../ros_bags/$SYS_ROSBAG_NAME
-# # '
-# #   'Republish' 'waitForRos; [ $SYS_IMAGE_TOPIC_REPUBLISED_ENABLED -eq 1 ] && rosrun image_transport republish compressed in:=/irat_red/camera/image raw out:=/irat/$SYS_IMAGE_TOPIC_REPUBLISED || exit
-# # '
-# #   'NeoSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam.launch
-# # '
-#   'NeoSlam' 'waitForRos; roslaunch neoslam neoslam.launch
-# '
-#   'RatSlam' 'waitForRos; roslaunch neoslam ratslam.launch
-# '
-#   'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
-# '
-#   'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver || exit
-# '
-#   'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:=$SYS_IMAGE_TOPIC || exit
-# '
-# #   'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/irataus.launch
-# # '
-#   'roscore' 'checkRos || roscore && exit
-# '
-# )
 
 input+=(
   'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
@@ -241,7 +78,7 @@ input+=(
 )
 
 # the name of the window to focus after start
-init_window="PlayDataset"
+init_window="NeoSlam"
 
 # automatically attach to the new session?
 # {true, false}, default true

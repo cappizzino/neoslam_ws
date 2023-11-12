@@ -48,6 +48,16 @@ waitForSimulation() {
   sleep 1;
 }
 
+# #{ waitForNeocortex()
+
+waitForNeocortex() {
+  until timeout 6s rostopic echo /neocortex_s/status -n 1 --noarr > /dev/null 2>&1; do
+    echo "waiting for neocortex"
+    sleep 1;
+  done
+  sleep 1;
+}
+
 ## --------------------------------------------------------------
 ## |                       check* macros                      |
 ## --------------------------------------------------------------
