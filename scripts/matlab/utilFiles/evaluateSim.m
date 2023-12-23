@@ -22,13 +22,14 @@ switch method
         S = D1 * D2';
         nOnes_D1 = sum(D1, 2);
         nOnes_D2 = sum(D2, 2);
-        mean_nOnes = [ones(length(nOnes_D1), 1), nOnes_D1] * [nOnes_D2'; ones(1, length(nOnes_D2))] / 2;
+        mean_nOnes = [ones(length(nOnes_D1), 1), nOnes_D1] *...
+            [nOnes_D2'; ones(1, length(nOnes_D2))] / 2;
     
         S = S ./ mean_nOnes;
         S = full(S);
         
     case 'cosine'
-        S = 1 - pdist2(D1, D2, method);
+        S = 1 - pdist2(D1, D2);
 end
   
 end

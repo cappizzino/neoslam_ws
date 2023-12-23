@@ -9,7 +9,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import sparse
 import time
-from neocortex.msg import ViewTemplate
+#from utils.pairwiseDescriptor import pairwiseDescriptors
+#from neocortex.msg import ViewTemplate
+#from ratslam_ros.msg import ViewTemplate
 
 class Plot:
     def __init__(self):
@@ -20,7 +22,7 @@ class Plot:
         rospy.Subscriber('odom', Odometry, self._odom, queue_size=1)
         rospy.Subscriber('gps/fix', NavSatFix, self.husky_gps, queue_size=1)
         rospy.Subscriber('feats_htm', BIN, self.plotHeatMap, queue_size=1)
-        rospy.Subscriber('LocalView/Template', ViewTemplate, self.plotViewCells, queue_size=1)
+        #rospy.Subscriber('LocalView/Template', ViewTemplate, self.plotViewCells, queue_size=1)
         
         # Variables
         self.x = []
@@ -83,80 +85,83 @@ class Plot:
         end = time.time()
         elapsed = (int)(end - self.start)
 
-        if(len(self.x) == 0):
-            return
+        # if(len(self.x) == 0):
+        #     return
         temp = elapsed
         timeSec = np.arange(0,elapsed,temp)
 
-        # First plot
-        # Format data
-        x = np.array(self.x)
-        y = np.array(self.y)
-        t = np.array(timeSec)
-        fig = plt.figure()
-        ax1 = fig.add_subplot(1,1,1)
-        #ax2 = fig.add_subplot(2,1,2)
-        # Plot
-        ax1.plot(x, y, label="Odometry")
-        #ax1.set(xlabel ='(m)', ylabel ='(m)', xlim =(-10, 250), ylim =(-110, 110))
-        ax1.set(xlabel ='(m)', ylabel ='(m)')
-        #ax1.plot(x1, y1, label = "GPS")
-        ax1.legend()
-        ax1.grid(True)
-        ax1.set_title('Position')
-        fig.savefig('odom_filtered.png')
+        # # First plot
+        # # Format data
+        # x = np.array(self.x)
+        # y = np.array(self.y)
+        # t = np.array(timeSec)
+        # fig = plt.figure()
+        # ax1 = fig.add_subplot(1,1,1)
+        # #ax2 = fig.add_subplot(2,1,2)
+        # # Plot
+        # ax1.plot(x, y, label="Odometry")
+        # #ax1.set(xlabel ='(m)', ylabel ='(m)', xlim =(-10, 250), ylim =(-110, 110))
+        # ax1.set(xlabel ='(m)', ylabel ='(m)')
+        # #ax1.plot(x1, y1, label = "GPS")
+        # ax1.legend()
+        # ax1.grid(True)
+        # ax1.set_title('Position')
+        # fig.savefig('odom_filtered.png')
 
         # Second plot
         fig2 = plt.figure()
         ax1_fig2 = fig2.add_subplot(1,1,1)
         # Plot
-        self.S_htm = self.pairwiseDescriptors(np.array(self.feats_htm_map), np.array(self.feats_htm_map))
-        ax1_fig2 = sns.heatmap(self.S_htm)
-        ax1_fig2.set_title('Heat Map HTM')
-        fig2.savefig('heatMap.png')
+        try:
+            self.S_htm = self.pairwiseDescriptors(np.array(self.feats_htm_map), np.array(self.feats_htm_map))
+            ax1_fig2 = sns.heatmap(self.S_htm)
+            ax1_fig2.set_title('Heat Map HTM')
+            fig2.savefig('heatMap.png')
+        except:
+            print("pairwiseDescriptors does not work.")
 
-        # Third plot
-        # Format data
-        x_gps = np.array(self.x_gps)
-        y_gps = np.array(self.y_gps)
-        fig3 = plt.figure()
-        ax1_fig3 = fig3.add_subplot(1,1,1)
-        #ax2 = fig.add_subplot(2,1,2)
-        # Plot
-        ax1_fig3.plot(x_gps, y_gps, label="GPS")
-        #ax1.set(xlabel ='(m)', ylabel ='(m)', xlim =(-10, 250), ylim =(-110, 110))
-        ax1_fig3.set(xlabel ='(m)', ylabel ='(m)')
-        #ax1.plot(x1, y1, label = "GPS")
-        ax1_fig3.legend()
-        ax1_fig3.grid(True)
-        ax1_fig3.set_title('Husky Position - GPS')
-        fig3.savefig('gps.png')
+        # # Third plot
+        # # Format data
+        # x_gps = np.array(self.x_gps)
+        # y_gps = np.array(self.y_gps)
+        # fig3 = plt.figure()
+        # ax1_fig3 = fig3.add_subplot(1,1,1)
+        # #ax2 = fig.add_subplot(2,1,2)
+        # # Plot
+        # ax1_fig3.plot(x_gps, y_gps, label="GPS")
+        # #ax1.set(xlabel ='(m)', ylabel ='(m)', xlim =(-10, 250), ylim =(-110, 110))
+        # ax1_fig3.set(xlabel ='(m)', ylabel ='(m)')
+        # #ax1.plot(x1, y1, label = "GPS")
+        # ax1_fig3.legend()
+        # ax1_fig3.grid(True)
+        # ax1_fig3.set_title('Husky Position - GPS')
+        # fig3.savefig('gps.png')
 
-        # Fourth Plot
-        scores = self.S_htm[-1][:]
-        len_scores = len(scores)
-        n_elements = 40
-        if len_scores < n_elements:
-            scores = []
-        else:
-            scores = scores[:-n_elements]
-        fig4 = plt.figure()
-        ax1_fig4 = fig4.add_subplot(1,1,1)
-        ax1_fig4.plot(scores)
-        ax1_fig4.set(xlabel ='image', ylabel ='Overlap value', ylim =(0, 1))
-        ax1_fig4.grid(True)
-        ax1_fig4.set_title('Overlap')
-        fig4.savefig('hist_scores.png')
+        # # Fourth Plot
+        # scores = self.S_htm[-1][:]
+        # len_scores = len(scores)
+        # n_elements = 40
+        # if len_scores < n_elements:
+        #     scores = []
+        # else:
+        #     scores = scores[:-n_elements]
+        # fig4 = plt.figure()
+        # ax1_fig4 = fig4.add_subplot(1,1,1)
+        # ax1_fig4.plot(scores)
+        # ax1_fig4.set(xlabel ='image', ylabel ='Overlap value', ylim =(0, 1))
+        # ax1_fig4.grid(True)
+        # ax1_fig4.set_title('Overlap')
+        # fig4.savefig('hist_scores.png')
 
-        # Fifth Plot
-        fig5 = plt.figure()
-        viewcell = np.array(self.viewcells)
-        ax1_fig5 = fig5.add_subplot(1,1,1)
-        ax1_fig5.plot(viewcell, 'bo')
-        ax1_fig5.set(xlabel ='Images', ylabel ='View Cells')
-        ax1_fig5.grid(True)
-        ax1_fig5.set_title('View Cells')
-        fig5.savefig('view_cells.png')
+        # # Fifth Plot
+        # fig5 = plt.figure()
+        # viewcell = np.array(self.viewcells)
+        # ax1_fig5 = fig5.add_subplot(1,1,1)
+        # ax1_fig5.plot(viewcell, 'bo')
+        # ax1_fig5.set(xlabel ='Images', ylabel ='View Cells')
+        # ax1_fig5.grid(True)
+        # ax1_fig5.set_title('View Cells')
+        # fig5.savefig('view_cells.png')
 
 
         plt.close('all')
@@ -184,6 +189,7 @@ class Plot:
         
         while not rospy.is_shutdown():
             count += 1
+            # rospy.loginfo(count)
             if(count == 5):
                 self.plot()
                 count = 0

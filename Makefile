@@ -8,6 +8,9 @@ build:
 execute-sys:
 	./scripts/tmux/start_system.sh
 
+execute-ratslam:
+	./scripts/tmux/start_system_ratslam.sh
+
 # execute-sim:
 # 	./scripts/tmux/start_simulation.sh
 

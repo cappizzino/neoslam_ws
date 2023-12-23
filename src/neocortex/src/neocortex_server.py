@@ -29,6 +29,7 @@ from PIL import Image as PIL_Image
 from scipy import sparse
 # HTM
 from nupic.algorithms.temporal_memory import TemporalMemory
+from nupic.algorithms.spatial_pooler import SpatialPooler
 from htmresearch.algorithms.apical_tiebreak_temporal_memory import ApicalTiebreakPairMemory as TM
 # Other functions
 from utils.getLSBH import get_lsbh
@@ -43,6 +44,10 @@ class ActionServer():
         # ****************************************
         # Load Parameters
         # ****************************************
+        self.sp_enable = rospy.get_param('sp_enable', True)
+        self.sp_number = rospy.get_param('sp_number', 1)
+        self.sp_columns = rospy.get_param('sp_columns', 16)
+        self.sp_numActiveColumns = rospy.get_param('sp_numActiveColumns', 4)
         self.tempory_memory = rospy.get_param('tempory_memory', "distal")
         self.image_filter = rospy.get_param('image_filter', "none")
         self.plot_image = rospy.get_param('plot_image', False)
@@ -81,10 +86,31 @@ class ActionServer():
                 return x
         self.model = AlexNetConv3()
         self.model.eval()
+        
+        # ****************************************
+        # Load Spatial Pooler
+        # ****************************************
+        rospy.loginfo("Load Spatial Pooler")
+        #random.seed(1)
+        inputDimensions = (self.sp_columns,1)
+        columnDimensions = (self.sp_columns,1)
+        inputSize = np.array(inputDimensions).prod()
+        self.columnNumber = np.array(columnDimensions).prod()
+        
+        self.sp = SpatialPooler(inputDimensions,
+            columnDimensions,
+            potentialRadius = int(0.5*inputSize),
+            numActiveColumnsPerInhArea = int(0.02*self.columnNumber),
+            globalInhibition = True,
+            seed = 1,
+            synPermActiveInc = 0.01,
+            synPermInactiveDec = 0.008
+        )
 
         # ****************************************
         # Load Temporal Memory
         # ****************************************
+        rospy.loginfo("Load Temporal Memory")
         self.tm = TemporalMemory(
             # Must be the same dimensions as t-->he SP
             columnDimensions=(2048,),
@@ -111,6 +137,7 @@ class ActionServer():
         # ****************************************
         # Load Apical Temporal Memory
         # ****************************************
+        rospy.loginfo("Load Apical Temporal Memory")
         self.externalSize = 180000
         self.externalOnBits = self.externalSize*0.1
         self.bottomUpOnBits = 512
@@ -290,7 +317,7 @@ class ActionServer():
                 # print("Cosine Similarity:\n", cnn_cosine)
         else:
             # ****************************************
-            # sLSBH (binarized descriptors)
+            # Encoder
             # ****************************************
             d1_slsbh = get_lsbh(features_vector, self.matrix_p, 0.25)
             non_zero_lsbh = np.nonzero(d1_slsbh[0])
@@ -298,6 +325,14 @@ class ActionServer():
             # Send sLSBH features
             self.feats_lsbh.data = d1_slsbh[0]
             self.publish_lsbh(self.feats_lsbh)
+            
+            # ****************************************
+            # Spatial Pooler
+            # ****************************************
+            sp_output = np.zeros(self.columnNumber, dtype="uint32")
+            self.sp.compute(d1_slsbh[0], learn=False, activeArray=sp_output)
+            sp_non_zero = np.nonzero(sp_output)
+            sp_non_zero_list = sp_non_zero[0].tolist()
 
             # ****************************************
             # Lateral prediction from Grid Cells
@@ -309,7 +344,10 @@ class ActionServer():
             # ****************************************
             # HTM
             # ****************************************
-            activeColumnIndices = non_zero_lsbh_list
+            if self.sp_enable == True:
+                activeColumnIndices = sp_non_zero_list
+            else:
+                activeColumnIndices = non_zero_lsbh_list
 
             if self.tempory_memory == "apical":
                 self.tm_apical.compute(activeColumnIndices, i_gc_sdr, learn=True)

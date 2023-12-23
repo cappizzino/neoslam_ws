@@ -57,17 +57,19 @@ export SLAM_MODEL="ratslam" # ratslam ; neoslam
 export DATASET="robotarium" # corridor ; robotarium ; outdoor ; irataus
 
 # Configuration files
-# export SYS_CONFIG_RATSLAM="ratslam_$DATASET.txt"
+export SYS_CONFIG_RATSLAM="ratslam_$DATASET.txt"
 # export SYS_CONFIG_NEOCORTEX="neocortex_$DATASET.yaml"
-export SYS_CONFIG_NEOCORTEX="neocortex.yaml"
+# export SYS_CONFIG_NEOCORTEX="neocortex.yaml"
+export SYS_ROSBAG_NAME=irat_aus_28112011.bag
 
 input=(
-  'NeoSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam.launch
+  'RatSlam' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam_irataus.launch
 '
 )
 
 input+=(
-  'NeoSlamPlot' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam_plot.launch
+  'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
+          rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME /irat_red/camera/image/compressed:=/camera/image/compressed /irat_red/odom:=/odom
 '
   'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
 '
@@ -75,12 +77,14 @@ input+=(
 '
   'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:=$SYS_IMAGE_TOPIC || exit
 '
+  'NeoSlamPlots' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam_plot.launch
+'
   'roscore' 'checkRos || roscore && exit
 '
 )
 
 # the name of the window to focus after start
-init_window="NeoSlam"
+init_window="PlayDataset"
 
 # automatically attach to the new session?
 # {true, false}, default true

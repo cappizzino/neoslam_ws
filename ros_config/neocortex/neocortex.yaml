@@ -3,7 +3,7 @@
 # ****************************************
 # General
 image_files: True    # True: read images from folder, False: wait topic
-waiting_rate: 1.0
+waiting_rate: 10.0 #1.0
 image_topic: '/image_raw'   # Set to environment variable in launch file
 # Via topic
 image_saver: False          # Set to environment variable in launch file
@@ -11,14 +11,14 @@ image_saver: False          # Set to environment variable in launch file
 sort_files: True
 frame_id: camera
 loop: 50
-image_folder: "/home/ingeniarius/neoslam_ws/scripts/matlab/experiments/barnbot/images_test/"
+image_folder: "/home/ingeniarius/neoslam_ws/scripts/matlab/experiments/barnbot/images/"
 # ****************************************
 # Neocortex Server
 # ****************************************
 # CNN
-cnn_compare: True
+cnn_compare: False
 # Preprocessing
-image_filter: "none" # gauss clahe none
+image_filter: "gauss" # gauss clahe none
 # Crop image
 crop_image: False
 crop_width_start: 0
@@ -28,6 +28,10 @@ crop_height_end: 416
 # ****************************************
 # Neocortex HTM
 # ****************************************
+sp_enable: True
+sp_number: 1
+sp_columns: 2048
+sp_numActiveColumns: 4
 # Tempory Memory - value="apical / distal"
 tempory_memory: "distal"
 # ****************************************
