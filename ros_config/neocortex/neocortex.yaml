@@ -2,7 +2,7 @@
 # Neocortex Visual
 # ****************************************
 # General
-image_files: True    # True: read images from folder, False: wait topic
+image_files: False    # True: read images from folder, False: wait topic
 waiting_rate: 10.0 #1.0
 image_topic: '/image_raw'   # Set to environment variable in launch file
 # Via topic
@@ -28,7 +28,7 @@ crop_height_end: 416
 # ****************************************
 # Neocortex HTM
 # ****************************************
-sp_enable: True
+sp_enable: False
 sp_number: 1
 sp_columns: 2048
 sp_numActiveColumns: 4
@@ -40,7 +40,7 @@ tempory_memory: "distal"
 # Local View Topic
 topic_local_view: '/LocalView/Template'
 # Interval mode
-interval_mode: False
+interval_mode: True
 theta_alpha: 384
 theta_rho: 2 #3
 score_interval: 470

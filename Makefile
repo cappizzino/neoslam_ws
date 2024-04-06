@@ -11,8 +11,8 @@ execute-sys:
 execute-ratslam:
 	./scripts/tmux/start_system_ratslam.sh
 
-# execute-sim:
-# 	./scripts/tmux/start_simulation.sh
+execute-robotarium:
+	./scripts/tmux/start_system_robotarium.sh
 
 install-deps:
 	bash -c "./singularity/install/install_tmux.sh"

@@ -90,22 +90,23 @@ class ActionServer():
         # ****************************************
         # Load Spatial Pooler
         # ****************************************
-        rospy.loginfo("Load Spatial Pooler")
-        #random.seed(1)
-        inputDimensions = (self.sp_columns,1)
-        columnDimensions = (self.sp_columns,1)
-        inputSize = np.array(inputDimensions).prod()
-        self.columnNumber = np.array(columnDimensions).prod()
-        
-        self.sp = SpatialPooler(inputDimensions,
-            columnDimensions,
-            potentialRadius = int(0.5*inputSize),
-            numActiveColumnsPerInhArea = int(0.02*self.columnNumber),
-            globalInhibition = True,
-            seed = 1,
-            synPermActiveInc = 0.01,
-            synPermInactiveDec = 0.008
-        )
+        if self.sp_enable == True:
+            rospy.loginfo("Load Spatial Pooler")
+            #random.seed(1)
+            inputDimensions = (self.sp_columns,1)
+            columnDimensions = (self.sp_columns,1)
+            inputSize = np.array(inputDimensions).prod()
+            self.columnNumber = np.array(columnDimensions).prod()
+
+            self.sp = SpatialPooler(inputDimensions,
+                columnDimensions,
+                potentialRadius = int(0.5*inputSize),
+                numActiveColumnsPerInhArea = int(0.02*self.columnNumber),
+                globalInhibition = True,
+                seed = 1,
+                synPermActiveInc = 0.01,
+                synPermInactiveDec = 0.008
+            )
 
         # ****************************************
         # Load Temporal Memory
@@ -217,6 +218,8 @@ class ActionServer():
             "neocortex_s", NeocortexViewCellAction, execute_cb=self.execute_cb, auto_start=False)
         self.a_server.start()
 
+        # rospy.on_shutdown(self.shutdown_requested)
+
     def execute_cb(self, goal):
         start = time.time()
         self.count += 1
@@ -327,14 +330,6 @@ class ActionServer():
             self.publish_lsbh(self.feats_lsbh)
             
             # ****************************************
-            # Spatial Pooler
-            # ****************************************
-            sp_output = np.zeros(self.columnNumber, dtype="uint32")
-            self.sp.compute(d1_slsbh[0], learn=False, activeArray=sp_output)
-            sp_non_zero = np.nonzero(sp_output)
-            sp_non_zero_list = sp_non_zero[0].tolist()
-
-            # ****************************************
             # Lateral prediction from Grid Cells
             # ****************************************
             i_gc = self.grid_cells.cells.flatten('C')
@@ -345,14 +340,27 @@ class ActionServer():
             # HTM
             # ****************************************
             if self.sp_enable == True:
+                # ****************************************
+                # Spatial Pooler
+                # ****************************************
+                sp_output = np.zeros(self.columnNumber, dtype="uint32")
+                self.sp.compute(d1_slsbh[0], learn=False, activeArray=sp_output)
+                sp_non_zero = np.nonzero(sp_output)
+                sp_non_zero_list = sp_non_zero[0].tolist()
                 activeColumnIndices = sp_non_zero_list
             else:
                 activeColumnIndices = non_zero_lsbh_list
 
             if self.tempory_memory == "apical":
+                # ****************************************
+                # Temporal Memory: Apical
+                # ****************************************
                 self.tm_apical.compute(activeColumnIndices, i_gc_sdr, learn=True)
                 activeCells = self.tm_apical.getWinnerCells()
             elif self.tempory_memory == "distal":
+                # ****************************************
+                # Temporal Memory: Distal
+                # ****************************************
                 self.tm.compute(activeColumnIndices, learn=True)
                 activeCells = self.tm.getWinnerCells()
 
@@ -465,6 +473,24 @@ class ActionServer():
     def publish_info(self, data):
         'Publish Information'
         self.info.publish(data)
+
+    # def save_sp(self):
+    #     with open("/home/ingeniarius/bag_files/out_sp.tmp", "wb") as f1:
+    #         self.sp.writeToFile(f1)
+
+    # def shutdown_requested(self):
+    #     rospy.loginfo("Saving files...")
+    #     self.save_sp()
+    #     rospy.loginfo("Saved.")
+    #     rospy.signal_shutdown("Saved")
+    #     # ****************************************
+    #     # Save HTM parameters
+    #     # ****************************************
+    #     # with open("/home/ingeniarius/bag_files/out_sp.tmp", "wb") as f1:
+    #     #     self.sp.writeToFile(f1)
+    #     # print(s.sp._numInputs)
+    #     # s.sp.printParameters()
+    #     # s.save_sp()
 
 if __name__ == "__main__":
     rospy.init_node("neocortex_server")

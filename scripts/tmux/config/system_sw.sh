@@ -12,6 +12,9 @@ export TORCH_HOME=$ROS_DATA_PATH/model/checkpoints
 export DIMENSION_REDUCTION=0    # If load from file, this parameter must be set to 0
 export MATRIX_HOME=$ROS_DATA_PATH/matrix
 
+# Enable Plot node
+export SYS_PLOT_ENABLED=0
+
 # Image Saver
 export SYS_IMAGE_ENABLED=0  # enable / disable image recording
 export SYS_IMAGE_ARGS=_save_all_image:=false

@@ -142,7 +142,7 @@ class VisualEye(object):
 
 if __name__ == '__main__':
     # Initialize node
-    rospy.init_node('visual_cortex', anonymous=True)
+    rospy.init_node('visual_cortex')
     try:
         # Initialize Eye
         visual_eye = VisualEye()

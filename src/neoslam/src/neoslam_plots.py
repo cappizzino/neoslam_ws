@@ -10,7 +10,7 @@ import seaborn as sns
 from scipy import sparse
 import time
 #from utils.pairwiseDescriptor import pairwiseDescriptors
-#from neocortex.msg import ViewTemplate
+from neocortex.msg import ViewTemplate
 #from ratslam_ros.msg import ViewTemplate
 
 class Plot:
@@ -20,9 +20,9 @@ class Plot:
 
         #Sub
         rospy.Subscriber('odom', Odometry, self._odom, queue_size=1)
-        rospy.Subscriber('gps/fix', NavSatFix, self.husky_gps, queue_size=1)
+        rospy.Subscriber('gps/fix', NavSatFix, self._gps, queue_size=1)
         rospy.Subscriber('feats_htm', BIN, self.plotHeatMap, queue_size=1)
-        #rospy.Subscriber('LocalView/Template', ViewTemplate, self.plotViewCells, queue_size=1)
+        rospy.Subscriber('LocalView/Template', ViewTemplate, self.plotViewCells, queue_size=1)
         
         # Variables
         self.x = []
@@ -48,7 +48,7 @@ class Plot:
         self.x.append(msg.pose.pose.position.x - self.x0)
         self.y.append(msg.pose.pose.position.y - self.y0)
 
-    def husky_gps(self, gps):
+    def _gps(self, gps):
         "GPS Data"
         if self.first_gps==1:
             self.lat0 = gps.latitude
@@ -153,15 +153,15 @@ class Plot:
         # ax1_fig4.set_title('Overlap')
         # fig4.savefig('hist_scores.png')
 
-        # # Fifth Plot
-        # fig5 = plt.figure()
-        # viewcell = np.array(self.viewcells)
-        # ax1_fig5 = fig5.add_subplot(1,1,1)
-        # ax1_fig5.plot(viewcell, 'bo')
-        # ax1_fig5.set(xlabel ='Images', ylabel ='View Cells')
-        # ax1_fig5.grid(True)
-        # ax1_fig5.set_title('View Cells')
-        # fig5.savefig('view_cells.png')
+        # Fifth Plot
+        fig5 = plt.figure()
+        viewcell = np.array(self.viewcells)
+        ax1_fig5 = fig5.add_subplot(1,1,1)
+        ax1_fig5.plot(viewcell, 'bo')
+        ax1_fig5.set(xlabel ='Images', ylabel ='View Cells')
+        ax1_fig5.grid(True)
+        ax1_fig5.set_title('View Cells')
+        fig5.savefig('view_cells.png')
 
 
         plt.close('all')

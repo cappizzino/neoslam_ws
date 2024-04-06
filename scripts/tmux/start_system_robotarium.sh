@@ -60,6 +60,7 @@ export DATASET="robotarium" # corridor ; robotarium ; outdoor ; irataus
 # export SYS_CONFIG_RATSLAM="ratslam_$DATASET.txt"
 # export SYS_CONFIG_NEOCORTEX="neocortex_$DATASET.yaml"
 export SYS_CONFIG_NEOCORTEX="neocortex.yaml"
+export SYS_ROSBAG_NAME=_2022-04-07-14-14-35_robotarium.bag
 
 input=(
   'Visual' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam_visual.launch
@@ -71,14 +72,17 @@ input=(
 )
 
 input+=(
-  'NeoSlamPlot' 'waitForRos; [ $SYS_PLOT_ENABLED -eq 1 ] && roslaunch $ROS_LAUNCH_PATH/neoslam_plot.launch || exit
+  'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
+          rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered /stereo_camera/left/image_raw:=/image_raw /odometry/filtered:=/odom
 '
-  'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
-'
-  'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver || exit
-'
-  'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:=$SYS_IMAGE_TOPIC || exit
-'
+#   'NeoSlamPlot' 'waitForRos; [ $SYS_PLOT_ENABLED -eq 1 ] && roslaunch $ROS_LAUNCH_PATH/neoslam_plot.launch || exit
+# '
+#   'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
+# '
+#   'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver || exit
+# '
+#   'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:=$SYS_IMAGE_TOPIC || exit
+# '
   'roscore' 'checkRos || roscore && exit
 '
 )

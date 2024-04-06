@@ -1,0 +1,17 @@
+<launch>
+
+  <arg name="ros_config_path" default="$(optenv ROS_CONFIG_PATH)"/>
+  <arg name="ros_config_experiment" default="$(optenv SYS_CONFIG_NEOCORTEX)"/>
+  <arg name="dirname" default="$(optenv ROS_LAUNCH_PATH)"/>
+
+  <rosparam file="$(arg ros_config_path)/neocortex/$(arg ros_config_experiment)" command="load" />
+
+  <node pkg="neocortex" name="neocortex_visual" type="neocortex_visual.py" output="screen">
+    <rosparam file="$(arg ros_config_path)/neocortex/$(arg ros_config_experiment)" command="load" />
+    <rosparam subst_value="true">
+      image_saver: $(env SYS_IMAGE_ENABLED)
+      image_topic: $(env SYS_IMAGE_TOPIC)
+    </rosparam>
+  </node>
+
+</launch>
