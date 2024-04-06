@@ -57,8 +57,7 @@ export SLAM_MODEL="ratslam" # ratslam ; neoslam
 export DATASET="robotarium" # corridor ; robotarium ; outdoor ; irataus
 
 # Configuration files
-# export SYS_CONFIG_RATSLAM="ratslam_$DATASET.txt"
-# export SYS_CONFIG_NEOCORTEX="neocortex_$DATASET.yaml"
+export SYS_CONFIG_RATSLAM="config_husky_hwu_robotarium.txt.in"
 export SYS_CONFIG_NEOCORTEX="neocortex.yaml"
 export SYS_ROSBAG_NAME=_2022-04-07-14-14-35_robotarium.bag
 
@@ -73,7 +72,7 @@ input=(
 
 input+=(
   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-          rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered /stereo_camera/left/image_raw:=/image_raw /odometry/filtered:=/odom
+          rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered /stereo_camera/left/image_raw:=/husky_hwu/image_raw /odometry/filtered:=/husky_hwu/odom
 '
 #   'NeoSlamPlot' 'waitForRos; [ $SYS_PLOT_ENABLED -eq 1 ] && roslaunch $ROS_LAUNCH_PATH/neoslam_plot.launch || exit
 # '

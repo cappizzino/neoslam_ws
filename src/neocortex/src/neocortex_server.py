@@ -8,7 +8,9 @@ from neocortex.msg import NeocortexViewCellAction, NeocortexViewCellFeedback, Ne
 from std_msgs.msg import ByteMultiArray as BIN
 from std_msgs.msg import Float32MultiArray as FLOAT
 from std_msgs.msg import UInt16MultiArray as UINT
-from neocortex.msg import ViewTemplate, infoExp
+#from neocortex.msg import ViewTemplate, infoExp
+from neocortex.msg import infoExp
+from ratslam_ros.msg import ViewTemplate
 from viewcell.view_cell import ViewCells
 from gridcell.grid_cell import GridCells
 from utils.pairwiseDescriptor import pairwiseDescriptors
