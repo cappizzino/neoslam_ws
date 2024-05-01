@@ -51,6 +51,9 @@ typedef double Posecell;
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/split_member.hpp>
 
+#include <ros/ros.h>
+#include "../utils/utility.h"
+
 namespace ratslam
 {
 
@@ -78,7 +81,7 @@ struct PosecellExperience {
 };
 
 
-class PosecellNetwork
+class PosecellNetwork  : public ParamServer
 {
 
 public:

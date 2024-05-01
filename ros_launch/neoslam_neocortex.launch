@@ -2,7 +2,6 @@
 
   <arg name="ros_config_path" default="$(optenv ROS_CONFIG_PATH)"/>
   <arg name="ros_config_experiment" default="$(optenv SYS_CONFIG_NEOCORTEX)"/>
-  <arg name="dirname" default="$(optenv ROS_LAUNCH_PATH)"/>
 
   <rosparam file="$(arg ros_config_path)/neocortex/$(arg ros_config_experiment)" command="load" />
 

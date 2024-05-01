@@ -1,23 +1,16 @@
 #!/bin/bash
 
-# SOURCE: https://github.com/ctu-mrs
-
-### BEGIN INIT INFO
-# Provides: tmux
-# Required-Start:    $local_fs $network dbus
-# Required-Stop:     $local_fs $network
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: start the server
-### END INIT INFO
-if [ "$(id -u)" == "0" ]; then
-  exec sudo -u mrs "$0" "$@"
-fi
-
 source $HOME/.bashrc
 
 # location of the running script
 DIR_PATH=$(cd $(dirname $0); pwd)
+ROS_BAG_PATH="$DIR_PATH/../../ros_bags"
+ROS_CONFIG_PATH="$DIR_PATH/../../ros_config"
+ROS_DATA_PATH="$DIR_PATH/../../ros_data"
+ROS_LAUNCH_PATH="$DIR_PATH/../../ros_launch"
+ROS_RVIZ_PATH="$DIR_PATH/../../ros_rviz"
+ROS_MAP_PATH="$DIR_PATH/../../maps"
+MEDIA_PATH="$DIR_PATH/../../src/ratslam_ros/src/media"
 
 # check if workspace was built
 [[ -f $DIR_PATH/../../devel/setup.bash ]] ||
@@ -45,7 +38,15 @@ SESSION_IP=$(hostname -I | awk '{print $1}')
 # * do NOT put ; at the end
 pre_input="mkdir -p $MAIN_DIR/$PROJECT_NAME; \
 export DIR_PATH=$DIR_PATH; \
-source $DIR_PATH/config/simulation.sh; \
+export ROS_BAG_PATH=$ROS_BAG_PATH; \
+export ROS_CONFIG_PATH=$ROS_CONFIG_PATH; \
+export ROS_DATA_PATH=$ROS_DATA_PATH; \
+export ROS_LAUNCH_PATH=$ROS_LAUNCH_PATH; \
+export ROS_RVIZ_PATH=$ROS_RVIZ_PATH; \
+export ROS_MAP_PATH=$ROS_MAP_PATH; \
+export MEDIA_PATH=$MEDIA_PATH; \
+source $DIR_PATH/config/system_hw.sh; \
+source $DIR_PATH/config/system_sw.sh; \
 source $DIR_PATH/../../singularity/mount/addons.sh; \
 source $DIR_PATH/../../devel/setup.bash"
 
@@ -54,20 +55,39 @@ source $DIR_PATH/../../devel/setup.bash"
 # * DO NOT PUT SPACES IN THE NAMES
 # * "new line" after the command    => the command will be called after start
 # * NO "new line" after the command => the command will wait for user's <enter>
+
+# Configuration files
+export SYS_CONFIG_NEOCORTEX="neocortex_robotarium.yaml"
+export SYS_CONFIG_NEOSLAM="neoslam_robotarium.yaml"
+export SYS_ROSBAG_NAME=_2022-04-07-14-14-35_robotarium.bag
+
 input=(
+  'Visual' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam_visual.launch
+'
+  'NeoCortex' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam_neocortex.launch
+'
+  'HP' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/ratslam.launch
+'
+)
+
+input+=(
   'PlayDataset' 'waitForRos; rosparam set /use_sim_time true &&
-          rosbag play --pause --clock $DIR_PATH/../../singularity/mount/_2022-04-07-14-14-35_robotarium.bag
+          rosbag play --pause --clock $ROS_BAG_PATH/$SYS_ROSBAG_NAME --topics /stereo_camera/left/image_raw /odometry/filtered /stereo_camera/left/image_raw:=/image_raw /odometry/filtered:=/odom
 '
-  'NeoSlam' 'waitForRos; roslaunch neoslam neoslam.launch
+  'NeoSlamPlot' 'waitForRos; [ $SYS_PLOT_ENABLED -eq 1 ] && roslaunch $ROS_LAUNCH_PATH/neoslam_plot.launch || exit
 '
-  'RatSlam' 'waitForRos; roslaunch neoslam ratslam.launch
+  'rosbag' 'waitForRos; [ $SYS_ROSBAG_ENABLED -eq 1 ] && rosbag record $SYS_ROSBAG_ARGS $SYS_ROSBAG_TOPICS || exit
+'
+  'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver || exit
+'
+  'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:=$SYS_IMAGE_TOPIC || exit
 '
   'roscore' 'checkRos || roscore && exit
 '
 )
 
 # the name of the window to focus after start
-init_window="PlayDataset"
+init_window="NeoCortex"
 
 # automatically attach to the new session?
 # {true, false}, default true
@@ -126,8 +146,10 @@ LOG_DIR="$MAIN_DIR/$PROJECT_NAME/"
 SUFFIX=$(date +"%Y_%m_%d_%H_%M_%S")
 SUBLOG_DIR="$LOG_DIR/"$ITERATOR"_"$SUFFIX""
 TMUX_DIR="$SUBLOG_DIR/tmux"
+IMAGE_DIR="$SUBLOG_DIR/images"
 mkdir -p "$SUBLOG_DIR"
 mkdir -p "$TMUX_DIR"
+mkdir -p "$IMAGE_DIR"
 
 # link the "latest" folder to the recently created one
 rm "$LOG_DIR/latest" > /dev/null 2>&1
@@ -182,4 +204,3 @@ else
   echo "You can later attach by calling:"
   echo "  tmux a -t $SESSION_NAME"
 fi
-

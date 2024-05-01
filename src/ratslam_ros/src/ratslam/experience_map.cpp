@@ -39,12 +39,11 @@ namespace ratslam
 
 ExperienceMap::ExperienceMap(ptree settings)
 {
-  get_setting_from_ptree(EXP_CORRECTION, settings, "exp_correction", 0.5);
-  get_setting_from_ptree(EXP_LOOPS, settings, "exp_loops", 10);
-  get_setting_from_ptree(EXP_INITIAL_EM_DEG, settings, "exp_initial_em_deg", 90.0);
-
-  MAX_GOALS = 10;
-
+  nh.param<double>("experience_map/exp_correction", EXP_CORRECTION, 0.5);
+  nh.param<int>("experience_map/exp_loops", EXP_LOOPS, 10);
+  nh.param<double>("experience_map/exp_initial_em_deg", EXP_INITIAL_EM_DEG, 90.0);
+  nh.param<int>("experience_map/max_goals", MAX_GOALS, 10);
+  
   experiences.reserve(10000);
   links.reserve(10000);
 

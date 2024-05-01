@@ -37,7 +37,7 @@
 namespace ratslam
 {
 
-class PosecellScene
+class PosecellScene : public ParamServer
 {
 public:
   PosecellScene(ptree & settings, PosecellNetwork *in_pc) :
@@ -52,7 +52,8 @@ public:
     driver = device->getVideoDriver();
     scene = device->getSceneManager();
 
-    get_setting_from_ptree(media_path, settings, "media_path", (std::string)"");
+    // get_setting_from_ptree(media_path, settings, "media_path", (std::string)"");
+    nh.param<std::string>("draw/media_path", media_path, "");
     pose_cells_scene = scene->createNewSceneManager(false);
 
     particles = new irr::scene::IBillboardSceneNode*[NUM_PARTICLES];

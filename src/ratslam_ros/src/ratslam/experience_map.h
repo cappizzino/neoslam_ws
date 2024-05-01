@@ -51,6 +51,9 @@ using boost::property_tree::ptree;
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/deque.hpp>
 
+#include <ros/ros.h>
+#include "../utils/utility.h"
+
 namespace ratslam
 {
 
@@ -115,7 +118,7 @@ struct Experience
 
 class ExperienceMapScene;
 
-class ExperienceMap
+class ExperienceMap  : public ParamServer
 {
 
 public:
@@ -242,7 +245,7 @@ private:
 
   int EXP_LOOPS;
   double EXP_CORRECTION;
-  unsigned int MAX_GOALS;
+  int MAX_GOALS;
   double EXP_INITIAL_EM_DEG;
 
   std::vector<Experience> experiences;

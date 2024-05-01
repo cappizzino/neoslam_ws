@@ -4,7 +4,7 @@
 # General
 image_files: False    # True: read images from folder, False: wait topic
 waiting_rate: 10.0 #1.0
-image_topic: '/husky_hwu/image_raw'   # Set to environment variable in launch file
+image_topic: '/image_raw'   # Set to environment variable in launch file
 # Via topic
 image_saver: False          # Set to environment variable in launch file
 # Via files
@@ -38,7 +38,7 @@ tempory_memory: "distal"
 # Neocortex Server: Spatial View Cells
 # ****************************************
 # Local View Topic
-topic_local_view: '/husky_hwu/LocalView/Template'
+topic_local_view: '/LocalView/Template'
 # Interval mode
 interval_mode: True
 theta_alpha: 384

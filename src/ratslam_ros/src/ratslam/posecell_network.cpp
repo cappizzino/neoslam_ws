@@ -33,6 +33,8 @@
 #include <assert.h>
 
 #include <float.h>
+#include <iostream>
+#include <ros/ros.h>
 
 using namespace std;
 
@@ -44,20 +46,36 @@ PosecellNetwork::PosecellNetwork(ptree settings)
   /*
    ** pose cell constants.
    */
-  get_setting_from_ptree(PC_DIM_XY, settings, "pc_dim_xy", 21);
-  get_setting_from_ptree(PC_DIM_TH, settings, "pc_dim_th", 36);
-  get_setting_from_ptree(PC_W_E_DIM, settings, "pc_w_e_dim", 7);
-  get_setting_from_ptree(PC_W_I_DIM, settings, "pc_w_i_dim", 5);
-  get_setting_from_ptree(PC_W_E_VAR, settings, "pc_w_e_var", 1);
-  get_setting_from_ptree(PC_W_I_VAR, settings, "pc_w_i_var", 2);
-  get_setting_from_ptree(PC_GLOBAL_INHIB, settings, "pc_global_inhib", 0.00002);
+  nh.param<int>("pose_cell/pc_dim_xy", PC_DIM_XY, 21);
+  nh.param<int>("pose_cell/pc_dim_th", PC_DIM_TH, 36);
+  nh.param<int>("pose_cell/pc_w_e_dim", PC_W_E_DIM, 7);
+  nh.param<int>("pose_cell/pc_w_i_dim", PC_W_I_DIM, 5);
+  nh.param<int>("pose_cell/pc_w_e_var", PC_W_E_VAR, 1);
+  nh.param<int>("pose_cell/pc_w_i_var", PC_W_I_VAR, 2);
+  nh.param<double>("pose_cell/pc_global_inhib", PC_GLOBAL_INHIB, 0.00002);
 
-  get_setting_from_ptree(VT_ACTIVE_DECAY, settings, "vt_active_decay", 1.0);
-  get_setting_from_ptree(PC_VT_INJECT_ENERGY, settings, "pc_vt_inject_energy", 0.15);
-  get_setting_from_ptree(PC_CELL_X_SIZE, settings, "pc_cell_x_size", 1.0);
-  get_setting_from_ptree(EXP_DELTA_PC_THRESHOLD, settings, "exp_delta_pc_threshold", 2.0);
+  nh.param<double>("pose_cell/vt_active_decay", VT_ACTIVE_DECAY, 1.0);
+  nh.param<double>("pose_cell/pc_vt_inject_energy", PC_VT_INJECT_ENERGY, 0.15);
+  nh.param<double>("pose_cell/pc_cell_x_size", PC_CELL_X_SIZE, 1.0);
+  nh.param<double>("pose_cell/exp_delta_pc_threshold", EXP_DELTA_PC_THRESHOLD, 2.0);
 
-  get_setting_from_ptree(PC_VT_RESTORE, settings, "pc_vt_restore", 0.05);
+  nh.param<double>("pose_cell/pc_vt_restore", PC_VT_RESTORE, 0.05);
+
+  // ROS_INFO("Parameter: %d", PC_DIM_XY);
+  // get_setting_from_ptree(PC_DIM_XY, settings, "pc_dim_xy", 21);
+  // get_setting_from_ptree(PC_DIM_TH, settings, "pc_dim_th", 36);
+  // get_setting_from_ptree(PC_W_E_DIM, settings, "pc_w_e_dim", 7);
+  // get_setting_from_ptree(PC_W_I_DIM, settings, "pc_w_i_dim", 5);
+  // get_setting_from_ptree(PC_W_E_VAR, settings, "pc_w_e_var", 1);
+  // get_setting_from_ptree(PC_W_I_VAR, settings, "pc_w_i_var", 2);
+  // get_setting_from_ptree(PC_GLOBAL_INHIB, settings, "pc_global_inhib", 0.00002);
+
+  // get_setting_from_ptree(VT_ACTIVE_DECAY, settings, "vt_active_decay", 1.0);
+  // get_setting_from_ptree(PC_VT_INJECT_ENERGY, settings, "pc_vt_inject_energy", 0.15);
+  // get_setting_from_ptree(PC_CELL_X_SIZE, settings, "pc_cell_x_size", 1.0);
+  // get_setting_from_ptree(EXP_DELTA_PC_THRESHOLD, settings, "exp_delta_pc_threshold", 2.0);
+
+  // get_setting_from_ptree(PC_VT_RESTORE, settings, "pc_vt_restore", 0.05);
 
   // the starting position within the posecell network
   best_x = floor((double)PC_DIM_XY / 2.0);

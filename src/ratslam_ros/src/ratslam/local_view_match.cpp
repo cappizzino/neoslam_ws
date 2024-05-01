@@ -47,21 +47,38 @@ namespace ratslam
 
 LocalViewMatch::LocalViewMatch(ptree settings)
 {
-  get_setting_from_ptree(VT_MIN_PATCH_NORMALISATION_STD, settings, "vt_min_patch_normalisation_std", (double)0);
-  get_setting_from_ptree(VT_PATCH_NORMALISATION, settings, "vt_patch_normalise", 0);
-  get_setting_from_ptree(VT_NORMALISATION, settings, "vt_normalisation", (double) 0);
-  get_setting_from_ptree(VT_SHIFT_MATCH, settings, "vt_shift_match", 25);
-  get_setting_from_ptree(VT_STEP_MATCH, settings, "vt_step_match", 5);
-  get_setting_from_ptree(VT_PANORAMIC, settings, "vt_panoramic", 0);
+  nh.param<double>("local_view/vt_min_patch_normalisation_std", VT_MIN_PATCH_NORMALISATION_STD, 0.0);
+  nh.param<int>("local_view/vt_patch_normalise", VT_PATCH_NORMALISATION, 0);
+  nh.param<double>("local_view/vt_normalisation", VT_NORMALISATION, 0.0);
+  nh.param<int>("local_view/vt_shift_match", VT_SHIFT_MATCH, 25);
+  nh.param<int>("local_view/vt_step_match", VT_STEP_MATCH, 5);
+  nh.param<int>("local_view/vt_panoramic", VT_PANORAMIC, 0);
+
+  nh.param<double>("local_view/vt_match_threshold", VT_MATCH_THRESHOLD, 0.03);
+  nh.param<bool>("local_view/vt_threshold_condition", VT_THRESHOLD_CONDITION, true);
+
+  nh.param<int>("local_view/template_x_size", TEMPLATE_X_SIZE, 1);
+  nh.param<int>("local_view/template_y_size", TEMPLATE_Y_SIZE, 1);
+  nh.param<int>("local_view/image_crop_x_min", IMAGE_VT_X_RANGE_MIN, 0);
+  nh.param<int>("local_view/image_crop_x_max", IMAGE_VT_X_RANGE_MAX, -1);
+  nh.param<int>("local_view/image_crop_y_min", IMAGE_VT_Y_RANGE_MIN, 0);
+  nh.param<int>("local_view/image_crop_y_max", IMAGE_VT_Y_RANGE_MAX, -1);
+
+  // get_setting_from_ptree(VT_MIN_PATCH_NORMALISATION_STD, settings, "vt_min_patch_normalisation_std", (double)0);
+  // get_setting_from_ptree(VT_PATCH_NORMALISATION, settings, "vt_patch_normalise", 0);
+  // get_setting_from_ptree(VT_NORMALISATION, settings, "vt_normalisation", (double) 0);
+  // get_setting_from_ptree(VT_SHIFT_MATCH, settings, "vt_shift_match", 25);
+  // get_setting_from_ptree(VT_STEP_MATCH, settings, "vt_step_match", 5);
+  // get_setting_from_ptree(VT_PANORAMIC, settings, "vt_panoramic", 0);
  
-  get_setting_from_ptree(VT_MATCH_THRESHOLD, settings, "vt_match_threshold", 0.03);
-  get_setting_from_ptree(VT_THRESHOLD_CONDITION, settings, "vt_threshold_condition", true);
-  get_setting_from_ptree(TEMPLATE_X_SIZE, settings, "template_x_size", 1);
-  get_setting_from_ptree(TEMPLATE_Y_SIZE, settings, "template_y_size", 1);
-  get_setting_from_ptree(IMAGE_VT_X_RANGE_MIN, settings, "image_crop_x_min", 0);
-  get_setting_from_ptree(IMAGE_VT_X_RANGE_MAX, settings, "image_crop_x_max", -1);
-  get_setting_from_ptree(IMAGE_VT_Y_RANGE_MIN, settings, "image_crop_y_min", 0);
-  get_setting_from_ptree(IMAGE_VT_Y_RANGE_MAX, settings, "image_crop_y_max", -1);
+  // get_setting_from_ptree(VT_MATCH_THRESHOLD, settings, "vt_match_threshold", 0.03);
+  // get_setting_from_ptree(VT_THRESHOLD_CONDITION, settings, "vt_threshold_condition", true);
+  // get_setting_from_ptree(TEMPLATE_X_SIZE, settings, "template_x_size", 1);
+  // get_setting_from_ptree(TEMPLATE_Y_SIZE, settings, "template_y_size", 1);
+  // get_setting_from_ptree(IMAGE_VT_X_RANGE_MIN, settings, "image_crop_x_min", 0);
+  // get_setting_from_ptree(IMAGE_VT_X_RANGE_MAX, settings, "image_crop_x_max", -1);
+  // get_setting_from_ptree(IMAGE_VT_Y_RANGE_MIN, settings, "image_crop_y_min", 0);
+  // get_setting_from_ptree(IMAGE_VT_Y_RANGE_MAX, settings, "image_crop_y_max", -1);
 
   TEMPLATE_SIZE = TEMPLATE_X_SIZE * TEMPLATE_Y_SIZE;
 

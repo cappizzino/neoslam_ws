@@ -105,20 +105,19 @@ int main(int argc, char * argv[])
   ROS_INFO_STREAM("RatSLAM algorithm by Michael Milford and Gordon Wyeth");
   ROS_INFO_STREAM("Distributed under the GNU GPL v3, see the included license file.");
 
-  if (argc < 2)
-  {
-    ROS_FATAL_STREAM("USAGE: " << argv[0] << " <config_file>");
-    exit(-1);
-  }
+  // if (argc < 2)
+  // {
+  //   ROS_FATAL_STREAM("USAGE: " << argv[0] << " <config_file>");
+  //   exit(-1);
+  // }
   std::string topic_root = "";
 
   boost::property_tree::ptree settings, ratslam_settings, general_settings;
-  read_ini(argv[1], settings);
+  // read_ini(argv[1], settings);
 
-  get_setting_child(general_settings, settings, "general", true);
-  get_setting_from_ptree(topic_root, general_settings, "topic_root", (std::string)"");
-  get_setting_child(ratslam_settings, settings, "ratslam", true);
-  lv = new ratslam::LocalViewMatch(ratslam_settings);
+  // get_setting_child(general_settings, settings, "general", true);
+  // get_setting_from_ptree(topic_root, general_settings, "topic_root", (std::string)"");
+  // get_setting_child(ratslam_settings, settings, "ratslam", true);
 
   if (!ros::isInitialized())
   {
@@ -126,6 +125,7 @@ int main(int argc, char * argv[])
   }
   ros::NodeHandle node;
 
+  lv = new ratslam::LocalViewMatch(ratslam_settings);
   ros::Publisher pub_vt = node.advertise<ratslam_ros::ViewTemplate>(topic_root + "/LocalView/Template", 0);
 
   image_transport::ImageTransport it(node);
@@ -134,9 +134,10 @@ int main(int argc, char * argv[])
 
 
 // #ifdef HAVE_IRRLICHT
+    node.param<bool>("draw/enable", use_graphics, true);
     boost::property_tree::ptree draw_settings;
-    get_setting_child(draw_settings, settings, "draw", true);
-    get_setting_from_ptree(use_graphics, draw_settings, "enable", true);
+    // get_setting_child(draw_settings, settings, "draw", true);
+    // get_setting_from_ptree(use_graphics, draw_settings, "enable", true);
     if (use_graphics)
       lvs = new ratslam::LocalViewScene(draw_settings, lv);
 // #endif

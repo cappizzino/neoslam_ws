@@ -8,11 +8,11 @@ build:
 execute-sys:
 	./scripts/tmux/start_system.sh
 
-execute-ratslam:
-	./scripts/tmux/start_system_ratslam.sh
+execute-ratslam-irataus:
+	./scripts/tmux/start_system_ratslam_irataus.sh
 
-execute-robotarium:
-	./scripts/tmux/start_system_robotarium.sh
+execute-neoslam-robotarium:
+	./scripts/tmux/start_system_neoslam_robotarium.sh
 
 install-deps:
 	bash -c "./singularity/install/install_tmux.sh"

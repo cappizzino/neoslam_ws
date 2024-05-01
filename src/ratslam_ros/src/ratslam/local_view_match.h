@@ -53,6 +53,9 @@ using boost::property_tree::ptree;
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include <ros/ros.h>
+#include "../utils/utility.h"
+
 namespace ratslam
 {
 
@@ -72,7 +75,7 @@ struct VisualTemplate
 
 };
 
-class LocalViewMatch
+class LocalViewMatch  : public ParamServer
 {
 public:
   friend class LocalViewScene;

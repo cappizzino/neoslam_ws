@@ -10,6 +10,7 @@ ROS_DATA_PATH="$DIR_PATH/../../ros_data"
 ROS_LAUNCH_PATH="$DIR_PATH/../../ros_launch"
 ROS_RVIZ_PATH="$DIR_PATH/../../ros_rviz"
 ROS_MAP_PATH="$DIR_PATH/../../maps"
+MEDIA_PATH="$DIR_PATH/../../src/ratslam_ros/src/media"
 
 # check if workspace was built
 [[ -f $DIR_PATH/../../devel/setup.bash ]] ||
@@ -43,6 +44,7 @@ export ROS_DATA_PATH=$ROS_DATA_PATH; \
 export ROS_LAUNCH_PATH=$ROS_LAUNCH_PATH; \
 export ROS_RVIZ_PATH=$ROS_RVIZ_PATH; \
 export ROS_MAP_PATH=$ROS_MAP_PATH; \
+export MEDIA_PATH=$MEDIA_PATH; \
 source $DIR_PATH/config/system_hw.sh; \
 source $DIR_PATH/config/system_sw.sh; \
 source $DIR_PATH/../../singularity/mount/addons.sh; \
@@ -76,8 +78,6 @@ input+=(
   'Saver' 'waitForRos; [ $SYS_IMAGE_ENABLED -eq 1 ] && rosrun image_view image_saver image:=$SYS_IMAGE_TOPIC $SYS_IMAGE_ARGS $SYS_IMAGE_PATH __name:=image_saver || exit
 '
   'Viewer' 'waitForRos; [ $SYS_RQT_VIEWER_ENABLED -eq 1 ] && rosrun rqt_image_view rqt_image_view image:=$SYS_IMAGE_TOPIC || exit
-'
-  'NeoSlamPlots' 'waitForRos; roslaunch $ROS_LAUNCH_PATH/neoslam_plot.launch
 '
   'roscore' 'checkRos || roscore && exit
 '
