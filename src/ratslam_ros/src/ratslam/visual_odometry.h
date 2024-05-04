@@ -37,9 +37,11 @@ using boost::property_tree::ptree;
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "../utils/utility.h"
+
 namespace ratslam {
 
-class VisualOdometry
+class VisualOdometry : public ParamServer
 {
 public:
 

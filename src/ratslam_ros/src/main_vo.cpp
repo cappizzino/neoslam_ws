@@ -29,6 +29,10 @@
 #include <iostream>
 using namespace std;
 
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <sensor_msgs/image_encodings.h>
+
 #include "utils/utils.h"
 #include "ratslam/visual_odometry.h"
 
@@ -56,9 +60,24 @@ void image_callback(sensor_msgs::ImageConstPtr image)
 
   static nav_msgs::Odometry odom_output;
 
-  vo->on_image(&image->data[0], (image->encoding == "bgr8" ? false : true), image->width, image->height, &odom_output.twist.twist.linear.x, &odom_output.twist.twist.angular.z);
+  cv_bridge::CvImagePtr cv_ptr;
+  sensor_msgs::ImageConstPtr imageMsg;
 
-  odom_output.header.stamp = image->header.stamp;
+  try
+    {
+      cv_ptr = cv_bridge::toCvCopy(image, sensor_msgs::image_encodings::BGR8);
+    }
+    catch (cv_bridge::Exception& e)
+    {
+      ROS_ERROR("cv_bridge exception: %s", e.what());
+      return;
+    }
+
+  imageMsg = cv_ptr->toImageMsg();
+
+  vo->on_image(&imageMsg->data[0], (imageMsg->encoding == "bgr8" ? false : true), imageMsg->width, imageMsg->height, &odom_output.twist.twist.linear.x, &odom_output.twist.twist.angular.z);
+
+  odom_output.header.stamp = imageMsg->header.stamp;
   odom_output.header.seq++;
 
   pub_vo.publish(odom_output);
@@ -71,27 +90,27 @@ int main(int argc, char * argv[])
   ROS_INFO_STREAM("RatSLAM algorithm by Michael Milford and Gordon Wyeth");
   ROS_INFO_STREAM("Distributed under the GNU GPL v3, see the included license file.");
 
-  if (argc < 2)
-  {
-    ROS_FATAL_STREAM("USAGE: " << argv[0] << " <config_file>");
-    exit(-1);
-  }
+  // if (argc < 2)
+  // {
+  //   ROS_FATAL_STREAM("USAGE: " << argv[0] << " <config_file>");
+  //   exit(-1);
+  // }
 
   std::string topic_root = "";
 
   boost::property_tree::ptree settings, general_settings, vo_settings;
-  read_ini(argv[1], settings);
-  ratslam::get_setting_child(vo_settings, settings, "visual_odometry", true);
-  ratslam::get_setting_child(general_settings, settings, "general", true);
-  ratslam::get_setting_from_ptree(topic_root, general_settings, "topic_root", (std::string) "");
-
-  vo = new ratslam::VisualOdometry(vo_settings);
+  // read_ini(argv[1], settings);
+  // ratslam::get_setting_child(vo_settings, settings, "visual_odometry", true);
+  // ratslam::get_setting_child(general_settings, settings, "general", true);
+  // ratslam::get_setting_from_ptree(topic_root, general_settings, "topic_root", (std::string) "");
 
   if (!ros::isInitialized())
   {
     ros::init(argc, argv, "RatSLAMVisualOdometry");
   }
   ros::NodeHandle node;
+
+  vo = new ratslam::VisualOdometry(vo_settings);
 
   pub_vo = node.advertise<nav_msgs::Odometry>(topic_root + "/odom", 0);
 

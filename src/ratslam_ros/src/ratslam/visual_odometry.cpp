@@ -37,21 +37,37 @@ namespace ratslam
 
 VisualOdometry::VisualOdometry(ptree settings)
 {
-  get_setting_from_ptree(VTRANS_IMAGE_X_MIN, settings, "vtrans_image_x_min", 0);
-  get_setting_from_ptree(VTRANS_IMAGE_X_MAX, settings, "vtrans_image_x_max", IMAGE_WIDTH);
-  get_setting_from_ptree(VTRANS_IMAGE_Y_MIN, settings, "vtrans_image_y_min", 0);
-  get_setting_from_ptree(VTRANS_IMAGE_Y_MAX, settings, "vtrans_image_y_max", IMAGE_HEIGHT);
+  // get_setting_from_ptree(VTRANS_IMAGE_X_MIN, settings, "vtrans_image_x_min", 0);
+  // get_setting_from_ptree(VTRANS_IMAGE_X_MAX, settings, "vtrans_image_x_max", IMAGE_WIDTH);
+  // get_setting_from_ptree(VTRANS_IMAGE_Y_MIN, settings, "vtrans_image_y_min", 0);
+  // get_setting_from_ptree(VTRANS_IMAGE_Y_MAX, settings, "vtrans_image_y_max", IMAGE_HEIGHT);
 
-  get_setting_from_ptree(VROT_IMAGE_X_MIN, settings, "vrot_image_x_min", 0);
-  get_setting_from_ptree(VROT_IMAGE_X_MAX, settings, "vrot_image_x_max", IMAGE_WIDTH);
-  get_setting_from_ptree(VROT_IMAGE_Y_MIN, settings, "vrot_image_y_min", 0);
-  get_setting_from_ptree(VROT_IMAGE_Y_MAX, settings, "vrot_image_y_max", IMAGE_HEIGHT);
+  // get_setting_from_ptree(VROT_IMAGE_X_MIN, settings, "vrot_image_x_min", 0);
+  // get_setting_from_ptree(VROT_IMAGE_X_MAX, settings, "vrot_image_x_max", IMAGE_WIDTH);
+  // get_setting_from_ptree(VROT_IMAGE_Y_MIN, settings, "vrot_image_y_min", 0);
+  // get_setting_from_ptree(VROT_IMAGE_Y_MAX, settings, "vrot_image_y_max", IMAGE_HEIGHT);
 
-  get_setting_from_ptree(CAMERA_FOV_DEG, settings, "camera_fov_deg", 50.0);
-  get_setting_from_ptree(CAMERA_HZ, settings, "camera_hz", 10.0);
+  // get_setting_from_ptree(CAMERA_FOV_DEG, settings, "camera_fov_deg", 50.0);
+  // get_setting_from_ptree(CAMERA_HZ, settings, "camera_hz", 10.0);
 
-  get_setting_from_ptree(VTRANS_SCALING, settings, "vtrans_scaling", 100.0);
-  get_setting_from_ptree(VTRANS_MAX, settings, "vtrans_max", 20.0);
+  // get_setting_from_ptree(VTRANS_SCALING, settings, "vtrans_scaling", 100.0);
+  // get_setting_from_ptree(VTRANS_MAX, settings, "vtrans_max", 20.0);
+
+  nh.param<int>("visual_odometry/vtrans_image_x_min", VTRANS_IMAGE_X_MIN, 0);
+  nh.param<int>("visual_odometry/vtrans_image_x_max", VTRANS_IMAGE_X_MAX, IMAGE_WIDTH);
+  nh.param<int>("visual_odometry/vtrans_image_y_min", VTRANS_IMAGE_Y_MIN, 0);
+  nh.param<int>("visual_odometry/vtrans_image_y_max", VTRANS_IMAGE_Y_MAX, IMAGE_HEIGHT);
+
+  nh.param<int>("visual_odometry/vrot_image_x_min", VROT_IMAGE_X_MIN, 0);
+  nh.param<int>("visual_odometry/vrot_image_x_max", VROT_IMAGE_X_MAX, IMAGE_WIDTH);
+  nh.param<int>("visual_odometry/vrot_image_y_min", VROT_IMAGE_Y_MIN, 0);
+  nh.param<int>("visual_odometry/vrot_image_y_max", VROT_IMAGE_Y_MAX, IMAGE_HEIGHT);
+
+  nh.param<double>("visual_odometry/camera_fov_deg", CAMERA_FOV_DEG, 50.0);
+  nh.param<double>("visual_odometry/camera_hz", CAMERA_HZ, 10.0);
+
+  nh.param<double>("visual_odometry/vtrans_scaling", VTRANS_SCALING, 100.0);
+  nh.param<double>("visual_odometry/vtrans_max", VTRANS_MAX, 20.0);
 
   vtrans_profile.resize(VTRANS_IMAGE_X_MAX - VTRANS_IMAGE_X_MIN);
   vtrans_prev_profile.resize(VTRANS_IMAGE_X_MAX - VTRANS_IMAGE_X_MIN);

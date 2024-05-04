@@ -11,6 +11,9 @@ execute-sys:
 execute-ratslam-irataus:
 	./scripts/tmux/start_system_ratslam_irataus.sh
 
+execute-ratslam-stlucia2007:
+	./scripts/tmux/start_system_ratslam_stlucia2007.sh
+
 execute-neoslam-robotarium:
 	./scripts/tmux/start_system_neoslam_robotarium.sh
 
